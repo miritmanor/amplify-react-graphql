@@ -18,16 +18,31 @@ import {
 } from "./graphql/mutations";
 
 const App = ({ signOut }) => {
-  const [notes, setNotes] = useState([]);
+  //const [notes, setNotes] = useState([]);
+  const [products,setProducts] = useState([])
 
   useEffect(() => {
-    fetchNotes();
+    //fetchNotes();
+    fetchProducts();
   }, []);
 
   async function fetchNotes() {
-    const apiData = await API.graphql({ query: listNotes });
-    const notesFromAPI = apiData.data.listNotes.items;
-    setNotes(notesFromAPI);
+    //const apiData = await API.graphql({ query: listNotes });
+    //const notesFromAPI = apiData.data.listNotes.items;
+    //setNotes(notesFromAPI);
+  }
+
+  async function fetchProducts() {
+    //const apiData = await API.graphql({ query: listNotes });
+    fetch('https://p2qa0zr9n5.execute-api.us-east-1.amazonaws.com/dev/products')
+       .then(response => response.json())
+       .then(data => {
+           console.log(data);
+           setProducts(data);
+       })
+    //const response = await fetch('https://p2qa0zr9n5.execute-api.us-east-1.amazonaws.com/dev/products');
+    //const notesFromAPI = apiData.data.listNotes.items;
+    //setNotes(notesFromAPI);
   }
 
   async function createNote(event) {
@@ -41,13 +56,14 @@ const App = ({ signOut }) => {
       query: createNoteMutation,
       variables: { input: data },
     });
-    fetchNotes();
+    //fetchNotes();
+    fetchProducts();
     event.target.reset();
   }
 
   async function deleteNote({ id }) {
-    const newNotes = notes.filter((note) => note.id !== id);
-    setNotes(newNotes);
+    //const newNotes = notes.filter((note) => note.id !== id);
+    //setNotes(newNotes);
     await API.graphql({
       query: deleteNoteMutation,
       variables: { input: { id } },
@@ -56,7 +72,7 @@ const App = ({ signOut }) => {
 
   return (
     <View className="App">
-      <Heading level={1}>Hello!</Heading>
+      <Heading level={1}>Hello again!</Heading>
       <View as="form" margin="3rem 0" onSubmit={createNote}>
         <Flex direction="row" justifyContent="center">
           <TextField
@@ -82,7 +98,7 @@ const App = ({ signOut }) => {
       </View>
       <Heading level={2}>Current Notes</Heading>
       <View margin="3rem 0">
-        {notes.map((note) => (
+        {products.map((note) => (
           <Flex
             key={note.id || note.name}
             direction="row"
