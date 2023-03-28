@@ -17,24 +17,25 @@ import {
   deleteNote as deleteNoteMutation,
 } from "./graphql/mutations";
 
+
 const App = ({ signOut }) => {
   //const [notes, setNotes] = useState([]);
   const [products,setProducts] = useState([])
+  var supplier="ממלכת האגוזים";
+  //supplier="";
+  const BASEURL="https://p2qa0zr9n5.execute-api.us-east-1.amazonaws.com/dev/"
 
   useEffect(() => {
-    //fetchNotes();
     fetchProducts();
   }, []);
 
-  async function fetchNotes() {
-    //const apiData = await API.graphql({ query: listNotes });
-    //const notesFromAPI = apiData.data.listNotes.items;
-    //setNotes(notesFromAPI);
-  }
-
   async function fetchProducts() {
     //const apiData = await API.graphql({ query: listNotes });
-    fetch('https://p2qa0zr9n5.execute-api.us-east-1.amazonaws.com/dev/products')
+    URL = BASEURL + 'products';
+    if (supplier != "") {
+        URL += '?supplier='+supplier;
+    }
+    fetch(URL)
        .then(response => response.json())
        .then(data => {
            console.log(data);
@@ -69,10 +70,105 @@ const App = ({ signOut }) => {
       variables: { input: { id } },
     });
   }
+    function SearchBar() {
+      const [supplier, setSupplier] = useState("");
+
+      return (
+        <form>
+          <input type="text" placeholder="Supplier..." value={supplier} onChange={(e) => {setSupplier(e.target.value);}}
+          />
+          <label>
+            <input type="checkbox" />
+            {' '}
+            Show all products
+          </label>
+       </form>
+      );
+    }
+
+    function FilterableProductTable({ products }) {
+      return (
+        <div>
+          <SearchBar />
+          <ProductTable products={products} />
+        </div>
+      );
+    }
+
+    function ProductRow({ product }) {
+      const name = product.stocked ? product.name :
+        <span style={{ color: 'red' }}>
+          {product.name}
+        </span>;
+
+        const columns=[];
+
+
+        Object.keys(product).forEach((key, index) => {
+          //console.log(key,product[key])
+          columns.push(
+            <td> {product[key]} </td>
+          ) ;
+        });
+      const line = <tr> nothing </tr>
+      console.log({product})
+
+      return (
+      <>
+        <tr>
+        {columns}
+        </tr>
+        </>
+      );
+    }
+
+  function ProductTable({ products }) {
+
+      const rows = [];
+      var productstable="";
+
+
+      var header=0;
+      products.forEach((product) => {
+        if (header == 0) {
+          var headercolumns=[];
+          Object.keys(product).forEach((key, index) => {
+            //console.log(key,product[key])
+            headercolumns.push(
+              <th> {key} </th>
+            ) ;
+          });
+          rows.push(
+           <tr>
+           {headercolumns}
+           </tr>
+          );
+          header=1;
+        }
+        rows.push(
+          <ProductRow
+            product={product}
+            key={product.sku} />
+        );
+      });
+
+    return (
+    <>
+      <Heading level={2}>Products</Heading>
+     {/*<SearchBar /> */}
+     <table>
+       <tbody>
+        {rows}
+        </tbody>
+        </table>
+      </>
+      );
+   }
 
   return (
     <View className="App">
-      <Heading level={1}>Hello again!</Heading>
+      <Heading level={1}>Commiz main database</Heading>
+      {/*
       <View as="form" margin="3rem 0" onSubmit={createNote}>
         <Flex direction="row" justifyContent="center">
           <TextField
@@ -96,28 +192,14 @@ const App = ({ signOut }) => {
           </Button>
         </Flex>
       </View>
-      <Heading level={2}>Current Notes</Heading>
-      <View margin="3rem 0">
-        {products.map((note) => (
-          <Flex
-            key={note.id || note.name}
-            direction="row"
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Text as="strong" fontWeight={700}>
-              {note.name}
-            </Text>
-            <Text as="span">{note.description}</Text>
-            <Button variation="link" onClick={() => deleteNote(note)}>
-              Delete note
-            </Button>
-          </Flex>
-        ))}
-      </View>
+     */}
+
+      <ProductTable products={products} />
       <Button onClick={signOut}>Sign Out</Button>
     </View>
   );
 };
+
+
 
 export default withAuthenticator(App);
