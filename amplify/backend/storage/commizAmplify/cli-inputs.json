@@ -1,0 +1,14 @@
+{
+  "resourceName": "commizAmplify",
+  "policyUUID": "b9a25609",
+  "bucketName": "commiz-amplify",
+  "storageAccess": "auth",
+  "guestAccess": [],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "triggerFunction": "S3Trigger756a8280",
+  "groupAccess": {}
+}
