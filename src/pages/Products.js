@@ -3,7 +3,7 @@ import "../App.css";
 import "@aws-amplify/ui-react/styles.css";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
+import {getBaseURL,fetchProducts} from "../lambdaAccess.js";
 
 import { API } from "aws-amplify";
 import {
@@ -26,12 +26,13 @@ const Products = () => {
   const [products,setProducts] = useState([])
   var supplier="ממלכת האגוזים";
   //supplier="";
-  const BASEURL="https://p2qa0zr9n5.execute-api.us-east-1.amazonaws.com/dev/"
+
+  const BASEURL=getBaseURL();
 
   useEffect(() => {
-    fetchProducts();
+    fetchProducts(setProducts);
   }, []);
-
+/*
   async function fetchProducts() {
     //const apiData = await API.graphql({ query: listNotes });
     var commizurl = BASEURL + 'products';
@@ -44,11 +45,9 @@ const Products = () => {
            console.log(data);
            setProducts(data);
        })
-    //const response = await fetch('https://p2qa0zr9n5.execute-api.us-east-1.amazonaws.com/dev/products');
-    //const notesFromAPI = apiData.data.listNotes.items;
-    //setNotes(notesFromAPI);
-  }
 
+  }
+*/
   async function createNote(event) {
     event.preventDefault();
     const form = new FormData(event.target);
@@ -73,21 +72,21 @@ const Products = () => {
       variables: { input: { id } },
     });
   }
-    function SearchBar() {
-      const [supplier, setSupplier] = useState("");
+  function SearchBar() {
+    const [supplier, setSupplier] = useState("");
 
-      return (
-        <form>
-          <input type="text" placeholder="Supplier..." value={supplier} onChange={(e) => {setSupplier(e.target.value);}}
-          />
-          <label>
-            <input type="checkbox" />
-            {' '}
-            Show all products
-          </label>
-       </form>
-      );
-    }
+    return (
+      <form>
+        <input type="text" placeholder="Supplier..." value={supplier} onChange={(e) => {setSupplier(e.target.value);}}
+        />
+        <label>
+          <input type="checkbox" />
+          {' '}
+          Show all products
+        </label>
+      </form>
+    );
+  }
 
     function FilterableProductTable({ products }) {
       return (
@@ -131,7 +130,7 @@ const Products = () => {
       var productstable="";
 
 
-      var header=0;
+      var header=0; 
       products.forEach((product) => {
         if (header == 0) {
           var headercolumns=[];

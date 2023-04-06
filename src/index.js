@@ -9,8 +9,9 @@ import config from './aws-exports';
 
 import { Auth, Storage } from 'aws-amplify';
 
-
+console.log("config: ",config);
 Amplify.configure(config);
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

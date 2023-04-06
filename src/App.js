@@ -15,6 +15,7 @@ import Layout from "./pages/Layout";
 import NoPage from "./pages/NoPage";
 import Products from "./pages/Products";
 import FileUploader from "./pages/upload";
+import Changes from "./pages/changes";
 
 const App = ({ signOut }) => {
    return(
@@ -25,7 +26,8 @@ const App = ({ signOut }) => {
        <Route path="products" element={<Products />} />
        <Route path="*" element={<NoPage />} />
        <Route path="upload" element={<FileUploader />} />
-     </Route>
+       <Route path="changes" element={<Changes />} />
+      </Route>
    </Routes>
    <div   style={{ marginTop: '50px' }}>
    <Button onClick={signOut}>Sign Out</Button>
