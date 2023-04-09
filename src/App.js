@@ -14,6 +14,7 @@ import {
 import Layout from "./pages/Layout";
 import NoPage from "./pages/NoPage";
 import Products from "./pages/Products";
+import StoreProducts from "./pages/StoreProducts";
 import FileUploader from "./pages/upload";
 import Changes from "./pages/changes";
 
@@ -24,9 +25,10 @@ const App = ({ signOut }) => {
      <Route path="/" element={<Layout />}>
        <Route index element={<Products />} />
        <Route path="products" element={<Products />} />
-       <Route path="*" element={<NoPage />} />
+       <Route path="storeproducts" element={<StoreProducts />} />
        <Route path="upload" element={<FileUploader />} />
        <Route path="changes" element={<Changes />} />
+       <Route path="*" element={<NoPage />} />
       </Route>
    </Routes>
    <div   style={{ marginTop: '50px' }}>

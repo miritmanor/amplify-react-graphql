@@ -26,6 +26,19 @@ export async function fetchProducts(setProducts) {
 
   }
 
+  export async function fetchStores(setStores) {
+  
+    var commizurl = BASEURL + 'stores';
+
+    fetch(commizurl)
+       .then(response => response.json())
+       .then(data => {
+           console.log(data);
+           setStores(data);
+       })
+
+  }
+
   async function authenticateSDK() {
     try {
     const user = await Auth.currentAuthenticatedUser();

@@ -68,7 +68,7 @@ export default function FileUploader() {
       console.log("received results -",results["StatusCode"]);
       const payload=JSON.parse(results["Payload"]);
       const o=JSON.parse(payload.body);
-      setUploadResults(Table(JSON.parse(o.body)));
+      setUploadResults(Table(JSON.parse(o.body)),'sku');
     
     } catch (error) {
       console.log("Error uploading file: ", error);

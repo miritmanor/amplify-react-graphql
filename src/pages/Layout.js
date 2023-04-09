@@ -7,13 +7,16 @@ const Layout = () => {
       <nav>
         <ul>
           <li>
-            <Link to="/products">Products</Link>
+            <Link to="/products">Products (main database)</Link>
           </li>
           <li>
-            <Link to="/upload">Upload</Link>
+            <Link to="/storeproducts">Products (in store)</Link>
+          </li>
+          <li>
+            <Link to="/upload">Upload changes file</Link>
           </li>       
           <li>
-            <Link to="/changes">Changes</Link>
+            <Link to="/changes">View and apply changes</Link>
           </li>
        </ul>
       </nav>

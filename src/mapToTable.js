@@ -1,6 +1,6 @@
 
 
-function Row({ row}) {
+function OneRow({ row},{mykey}) {
     var columns=[];
 
     Object.keys(row).forEach((key, index) => {
@@ -12,7 +12,7 @@ function Row({ row}) {
 
     return (
     <>
-      <tr>
+      <tr key={mykey}>
       {columns}
       </tr>
       </>
@@ -20,37 +20,36 @@ function Row({ row}) {
   }
 
   
-  export function Table(rowList) {
+  export function Table(rowList,rowkey) {
 
     const rows = [];
-
-    var header=0; 
-
+ 
     //console.log(rowList);
 
+    var headercolumns=[];
+    Object.keys(rowList[0]).forEach((key, index) => {
+        headercolumns.push(
+            <th> {key} </th>
+        ) ;
+    });
+
     rowList.forEach((row) => {
-        if (header === 0) {
-            var headercolumns=[];
-            Object.keys(row).forEach((key, index) => {
-                headercolumns.push(
-                    <th> {key} </th>
-                ) ;
-            });
-            rows.push(
-                <tr> {headercolumns} </tr>
-            );
-            header=1;
-        }
+ 
         rows.push(
-            <Row row={row} />
+            <OneRow row={row} mykey={row[rowkey]}/>
         );
     });
 
     return (
         <>
             <table>
+                <thead>
+                    <tr>
+                    {headercolumns}
+                    </tr>
+                </thead>
                 <tbody>
-                {rows}
+                    {rows}
                 </tbody>
             </table>
         </>
