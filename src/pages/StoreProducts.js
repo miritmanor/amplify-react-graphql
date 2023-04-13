@@ -60,14 +60,14 @@ const StoreProducts = () => {
                 setStatus("Waiting for results");
                 invokeLambdaDirectly('GET','/products/{storename+}','/products/'+inputs.storename,{'storename':inputs.storename},{},"").then(res => {
                     console.log(res);
-                    const payload= JSON.parse(res.Payload);
-                    const body=JSON.parse(payload.body);
                     const message=checkServerResponse(res);
                     if (message != "") {
                         console.log("Error: ",message);
                         setStatus(message);
                     }
                     else {
+                        const payload= JSON.parse(res.Payload);
+                        const body=JSON.parse(payload.body);
                         setProducts(body);
                         setStatus("ready");
                     }
@@ -89,14 +89,14 @@ const StoreProducts = () => {
                 setStatus("Waiting for results");
                 invokeLambdaDirectly('POST','/products/import','/products/import',{},{'store':inputs.storename},"").then(res => {
                     console.log(res);
-                    const payload= JSON.parse(res.Payload);
-                    const body=JSON.parse(payload.body);
                     const message=checkServerResponse(res);
                     if (message != "") {
                         console.log("Error: ",message);
                         setStatus(message);
                     }
                     else {
+                        const payload= JSON.parse(res.Payload);
+                        const body=JSON.parse(payload.body);
                         setResults(body);
                         setStatus("ready");
                     }

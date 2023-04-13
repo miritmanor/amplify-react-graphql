@@ -76,8 +76,7 @@ const Changes = () => {
             const storename=inputs.storename;
             invokeLambdaDirectly('PUT','/changes/{storename+}','/changes/'+storename,{'storename':storename},"","").then(res => {
                 console.log(res);
-                const payload= JSON.parse(res.Payload);
-                const body=JSON.parse(payload.body);
+
                 const message=checkServerResponse(res);
                 if (message != "") {
                     console.log("Error: ",message);
@@ -86,6 +85,8 @@ const Changes = () => {
                 else {
                     setStatus("ready");
                     type="results";
+                    const payload= JSON.parse(res.Payload);
+                    const body=JSON.parse(payload.body);
                     setChanges(body);
                 }
             }
