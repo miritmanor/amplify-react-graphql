@@ -20,8 +20,11 @@ function OneRow({ row},{mykey}) {
   }
 
   
-  export function Table(rowList,rowkey) {
+  export function Table({rowList},{rowkey}) {
 
+    if (rowList.length ==0) {
+        return "";
+    }
     const rows = [];
  
     //console.log(rowList);

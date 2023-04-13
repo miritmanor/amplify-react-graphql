@@ -24,7 +24,7 @@ import {
 const Products = () => {
   //const [notes, setNotes] = useState([]);
   const [products,setProducts] = useState([])
-  var supplier="ממלכת האגוזים";
+  var supplier="";
   //supplier="";
 
   const BASEURL=getBaseURL();

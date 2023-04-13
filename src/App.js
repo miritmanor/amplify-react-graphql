@@ -32,7 +32,7 @@ const App = ({ signOut }) => {
       </Route>
    </Routes>
    <div   style={{ marginTop: '50px' }}>
-   <Button onClick={signOut}>Sign Out</Button>
+   <Button size="small" onClick={signOut}>Sign Out</Button>
    </div>
  </BrowserRouter>
    )

@@ -4,12 +4,12 @@ import AWS from 'aws-sdk';
 const LAMBDA_NAME='commiz-admin';
 const REGION='us-east-1';
 const BASEURL="https://p2qa0zr9n5.execute-api.us-east-1.amazonaws.com/dev/";  // API gateway URL
-export  function getBaseURL() {
-    console.log("in getBaseURL");
-    return (BASEURL);
-}
+  export  function getBaseURL() {
+      console.log("in getBaseURL");
+      return (BASEURL);
+  }
 
-export async function fetchProducts(setProducts) {
+  export async function fetchProducts(setProducts) {
     //const apiData = await API.graphql({ query: listNotes });
     var commizurl = BASEURL + 'products';
     /*
@@ -25,6 +25,7 @@ export async function fetchProducts(setProducts) {
        })
 
   }
+
 
   export async function fetchStores(setStores) {
   
@@ -58,7 +59,7 @@ export async function fetchProducts(setProducts) {
 }
 
 
-  export async function invokeLambdaDirectly(httpMethod,resource,path,pathParameters,queryStringParameters,body) {
+export async function invokeLambdaDirectly(httpMethod,resource,path,pathParameters,queryStringParameters,body) {
 
     AWS.config.update({region:REGION});
     const user = await Auth.currentAuthenticatedUser();
@@ -103,6 +104,32 @@ export async function fetchProducts(setProducts) {
         return(response);
     } catch (error) {
         console.error(error);
+    }
+  }
+
+  export function checkServerResponse(res) {
+    console.log(res);
+    try {
+      const payload= JSON.parse(res.Payload);
+      if (res.StatusCode != 200) {
+          return("Failed "+payload);
+      } else {
+          const body=JSON.parse(payload.body);
+            if (typeof body ==='string') {
+              return(body);
+            } 
+            else {
+              if (body.length == 0) {
+                // empty results
+                return("no results to show");
+              } else {
+                return("");
+              }
+          }
+      }
+    } catch (error) {
+      console.log(error);
+      return(error);
     }
   }
   

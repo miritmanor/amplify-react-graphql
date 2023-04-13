@@ -3,6 +3,8 @@ import { Storage } from 'aws-amplify';
 import { useState } from 'react';
 import {invokeLambdaDirectly} from "../lambdaAccess.js";
 import {Table} from "../mapToTable.js";
+import {Status} from "../status.js";
+
 
 export default function FileUploader() {
   const s3 = new AWS.S3();
@@ -10,20 +12,8 @@ export default function FileUploader() {
   const [file, setFile] = useState(null);
   const [fileContents, setFileContents] = useState(null);
   const [uploadResults, setUploadResults] = useState("");
+  const [status,setStatus] = useState("");
 
-  const ShowResults = () => {
-    if (uploadResults != "") {
-      return ( <div> 
-        <h2> Results of changes to products (new values displayed)</h2>
-        {uploadResults} 
-        </div>)
-    } else {
-      return ( <div>
-        
-      </div>)
-    }
-  }
-  
   const handleFileSelect = (e) => {
     const selectedFile = e.target.files[0];
     setFile(selectedFile);
@@ -35,6 +25,7 @@ export default function FileUploader() {
     reader.readAsBinaryString(selectedFile);
 
    }
+   /*
   const uploadToS3 = async () => {
     if (!file) {
       return;
@@ -49,6 +40,7 @@ export default function FileUploader() {
     }
 
   }
+  */
 
   const applyChangesThroughS3 = async () => {
     if (!file) {
@@ -56,26 +48,30 @@ export default function FileUploader() {
     }
     try {
       console.log(file);
+      setStatus("Uploading file");
       await Storage.put(file.name, file, {
         //contentType: "image/png", // contentType is optional
       });
+      setStatus("Importing to database");
       var results = await invokeLambdaDirectly("PUT",
         "/products/import_changes_from_file",
         "/products/import_changes_from_file",
         "",
         {"filename": file.name},
         "") ;
-      console.log("received results -",results["StatusCode"]);
+      //console.log("received results -",results["StatusCode"]);
       const payload=JSON.parse(results["Payload"]);
       const o=JSON.parse(payload.body);
-      setUploadResults(Table(JSON.parse(o.body)),'sku');
+      console.log("Received results: ",JSON.parse(o.body));
+      setStatus("ready");
+      setUploadResults(JSON.parse(o.body));
     
     } catch (error) {
       console.log("Error uploading file: ", error);
     }
 
   }
-  
+  /* 
   const applyChangesFromFile = async () => {
     console.log("in applyChangesFromFile");
     if (!file) {
@@ -101,6 +97,23 @@ export default function FileUploader() {
     }
 
   }
+  */
+
+  function DisplayContent() {
+
+    if (uploadResults.length != 0) {
+        return (
+          <div> 
+          <h2> Results of changes to products (new values displayed)</h2>
+           <Table rowList={uploadResults} rowkey='sku' />
+           </div>
+        )
+    } else {
+         return (
+            " "
+        )
+    }
+}
 
   return (
     <div style={{ marginTop: '50px' }}>
@@ -118,7 +131,8 @@ export default function FileUploader() {
           <img src={fileUrl} alt="uploaded" />
         </div>
       )}
-      <ShowResults/>
+      <Status status={status} />
+      <DisplayContent/>
     </div>
   );
 }

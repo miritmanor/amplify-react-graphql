@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import "../App.css";
-import "@aws-amplify/ui-react/styles.css";
-import {getBaseURL,fetchProducts} from "../lambdaAccess.js";
-
-import { API } from "aws-amplify";
+//import "../App.css";
+//import "@aws-amplify/ui-react/styles.css";
+import {fetchStores,invokeLambdaDirectly,checkServerResponse} from "../lambdaAccess.js";
+import {Table} from "../mapToTable.js";
 import {
   Button,
+  SelectField,
   Flex,
   Heading,
   Text,
@@ -13,57 +13,150 @@ import {
   View,
   withAuthenticator,
 } from "@aws-amplify/ui-react";
-import {
-  createNote as createNoteMutation,
-  deleteNote as deleteNoteMutation,
-} from "../graphql/mutations";
+import {Status} from "../status.js";
+
 
 
 const StoreProducts = () => {
   
-  const [products,setProducts] = useState([])
-  var supplier="ממלכת האגוזים";
+    const [products,setProducts] = useState([]);
+    const [results,setResults] = useState([]);
+    const [inputs, setInputs] = useState({});
+    const [status,setStatus] = useState("");
+    const [stores,setStores] = useState([]);
 
-  const BASEURL=getBaseURL();
+    //var outputType='Products';
 
-  useEffect(() => {
-    fetchProducts(setProducts);
-  }, []);
+    useEffect(() => {
+        //Runs only on the first render
+        console.log("fetching stores");
+        fetchStores(setStores);
+     }, []);
 
 
+    function InputForm() {
 
-  function SearchBar() {
-    const [supplier, setSupplier] = useState("");
+        console.log("in inputform");
+        const handleChange = (event) => {
+            console.log("in handleChange");
+            console.log(event.target.name, event.target.value);
+            const name = event.target.name;
+            const value = event.target.value;
+            setInputs(values => ({...values, [name]: value}))
+            setProducts([]);
+            setResults([]);
+        }
+ 
+        const showProducts = () => {
+            console.log("in showProducts");
+            console.log("inputs:",inputs);
+            if (!Object.hasOwn(inputs, 'storename') || !inputs.storename) {
+                console.log("missing store name");
+                setStatus("Store name missing");
+                setProducts([]);
+            } else {
+                setProducts([]);
+                setResults([]);
+                setStatus("Waiting for results");
+                invokeLambdaDirectly('GET','/products/{storename+}','/products/'+inputs.storename,{'storename':inputs.storename},{},"").then(res => {
+                    console.log(res);
+                    const payload= JSON.parse(res.Payload);
+                    const body=JSON.parse(payload.body);
+                    const message=checkServerResponse(res);
+                    if (message != "") {
+                        console.log("Error: ",message);
+                        setStatus("Server error: "+message);
+                    }
+                    else {
+                        setProducts(body);
+                        setStatus("ready");
+                    }
+                }
+                );
+            }
+        }
 
-    return (
-      <form>
-        <input type="text" placeholder="Supplier..." value={supplier} onChange={(e) => {setSupplier(e.target.value);}}
-        />
-        <label>
-          <input type="checkbox" />
-          {' '}
-          Show all products
-        </label>
-      </form>
-    );
-  }
+        const importProducts = () => {
+            console.log("in importProducts");
+            console.log("inputs:",inputs);
+            if (!Object.hasOwn(inputs, 'storename') || !inputs.storename) {
+                console.log("missing store name");
+                setStatus("Store name missing");
+                setProducts([]);
+            } else {
+                setProducts([]);
+                setResults([]);
+                setStatus("Waiting for results");
+                invokeLambdaDirectly('POST','/products/import','/products/import',{},{'store':inputs.storename},"").then(res => {
+                    console.log(res);
+                    const payload= JSON.parse(res.Payload);
+                    const body=JSON.parse(payload.body);
+                    const message=checkServerResponse(res);
+                    if (message != "") {
+                        console.log("Error: ",message);
+                        setStatus("Server error: "+message);
+                    }
+                    else {
+                        setResults(body);
+                        setStatus("ready");
+                    }
+                } );
+            }
+        }
 
-    function FilterableStoreProductTable({ products }) {
-      return (
-        <div>
-          <SearchBar />
-        </div>
-      );
+        return (
+            <Flex   alignItems="center"    alignContent="flex-start" >
+                <SelectField  key="storename" name="storename" placeholder="Select store" value={inputs.storename || ""}  onChange={handleChange}>
+                        {stores.map((store) => (
+                            <option value={store.StoreName}>
+                                {store.StoreName}
+                            </option>
+                        ))}
+
+                </SelectField>
+                <Button   key="showproducts" name="show_products" onClick={showProducts} >
+                    Show products 
+                </Button>
+                <Button   key="importproducts" name="import_products" onClick={importProducts} >
+                    Import from store to main database 
+                </Button>            
+            </Flex>
+        )
     }
 
-    
+    function DisplayContent() {
 
-  return (
-    <View className="App">
-      <Heading level={1}>Store Products</Heading>
+        if (results.length != 0) {
+            return (
+                <>
+                <h2>Results for products import from store</h2>
+                <Table rowList={results} rowkey='sku' />
+                </>
+            )
+        }
+        else if (products.length != 0) {
+            return (
+                <>
+                <h2>List of products currently in store</h2>
+                <Table rowList={products} rowkey='ProductSKU' />
+                </>
+            )
+        } else {
+             return (
+                " "
+            )
+        }
+    }
 
-    </View>
-  );
+    return (
+        <View style={{ marginTop: '50px' }}>
+            <h2>Select store to display products</h2>
+            <InputForm/>
+            <Status status={status} />
+            <DisplayContent  />
+        </View>
+    );
+
 };
 
 

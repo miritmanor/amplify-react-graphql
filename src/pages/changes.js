@@ -1,29 +1,35 @@
 import React, { useState, useEffect } from "react";
-import "../App.css";
-import "@aws-amplify/ui-react/styles.css";
-import {invokeLambdaDirectly} from "../lambdaAccess.js";
+//import "../App.css";
+//import "@aws-amplify/ui-react/styles.css";
+import {invokeLambdaDirectly,checkServerResponse} from "../lambdaAccess.js";
 import {fetchStores} from "../lambdaAccess.js";
-
+import {Table} from "../mapToTable.js";
+import {Status} from "../status.js";
 import {
-  Heading,
-  Text,
-} from "@aws-amplify/ui-react";
+    Button,
+    SelectField,
+    Flex,
+    Heading,
+    Text,
+    TextField,
+    View,
+  } from "@aws-amplify/ui-react";
 
 
 const Changes = () => {
 
     const [changes,setChanges] = useState([]);
     const [status,setStatus] = useState("");
-    //var changeList="";
     const [inputs, setInputs] = useState({});
     const [stores,setStores] = useState([])
+    var type="none"; // type is none when no results available, when available - shows the type of results (differences or results)
 
     useEffect(() => {
         //Runs only on the first render
         fetchStores(setStores);
       }, []);
 
-      const showStoreDifferences = () => {
+    const showStoreDifferences = () => {
         console.log("in showStoreDifferences");
         //setInputs(values => ({...values,  showStoreDifferences: true }));
         console.log("inputs:",inputs);
@@ -42,10 +48,18 @@ const Changes = () => {
                     console.log(res);
                     const payload= JSON.parse(res.Payload);
                     const body=JSON.parse(payload.body);
-                    setStatus("ready");
-                    setChanges(body);
+                    const message=checkServerResponse(res);
+                    if (message != "") {
+                        console.log("Error: ",message);
+                        setStatus("Server error: "+message);
                     }
-                );
+                    else {
+                        setStatus("ready");
+                        type="differences";
+                        setChanges(body);
+                    }                   
+                }
+            );
         }
     }
 
@@ -64,10 +78,19 @@ const Changes = () => {
                 console.log(res);
                 const payload= JSON.parse(res.Payload);
                 const body=JSON.parse(payload.body);
-                setStatus("ready");
-                setChanges(body);
+                const message=checkServerResponse(res);
+                if (message != "") {
+                    console.log("Error: ",message);
+                    setStatus(message);
                 }
-            )
+                else {
+                    setStatus("ready");
+                    type="results";
+                    setChanges(body);
+                }
+            }
+            );
+   
         }
 
     }
@@ -79,144 +102,58 @@ const Changes = () => {
             const name = event.target.name;
             const value = event.target.value;
             setInputs(values => ({...values, [name]: value}))
+            setStatus("");
         }
  
-        const handleSubmit = (event) => {
-            console.log("in handleSubmit");
-            event.preventDefault();
-            console.log("inputs:",inputs);
-            setStatus("Waiting for results");
-            if (!Object.hasOwn(inputs, 'storename') || !inputs.storename) {
-                console.log("missing store name");
-                setStatus("Store name missing");
-                setChanges([]);
-            } else {
-                const storename=inputs.storename;
-                if (inputs.showStoreDifferences) {
-                    invokeLambdaDirectly('GET','/changes/{storename+}','/changes/'+storename,{'storename':storename},"","").then(res => {
-                            console.log(res);
-                            const payload= JSON.parse(res.Payload);
-                            const body=JSON.parse(payload.body);
-                            setStatus("ready");
-                            setChanges(body);
-                        }
-                    );
-                }
-                if (inputs.applyToStore) {
-                    invokeLambdaDirectly('PUT','/changes/{storename+}','/changes/'+storename,{'storename':storename},"","").then(res => {
-                        console.log(res);
-                        const payload= JSON.parse(res.Payload);
-                        const body=JSON.parse(payload.body);
-                        setStatus("ready");
-                        setChanges(body);
-                    }
-                );
-              }
-            }
+         return (
 
-        }
-
-        return (
-
-            <form onSubmit={handleSubmit}>
-                <label>Store name:
-                    <select key="storename" name="storename" value={inputs.storename || ""}  onChange={handleChange}>
-                        <option key="" value="">Select store</option>
+            <Flex   alignItems="center"    alignContent="flex-start" >
+                <SelectField  key="storename" name="storename" placeholder="Select store" value={inputs.storename || ""}  onChange={handleChange}>
                         {stores.map((store) => (
-                            <option key={store.StoreName} value={store.StoreName}>
+                            <option value={store.StoreName}>
                                 {store.StoreName}
                             </option>
                         ))}
-                    </select>
-                </label>
+
+                </SelectField>
                 <label> Supplier name (optional):
-                <input 
-                    type="text" 
-                    name="supplier" 
-                    key="supplier"
-                    autoFocus
-                    value={inputs.supplier || ""} 
-                    onChange={handleChange}
-                />
+                <input  type="text"  name="supplier"  key="supplier"  autoFocus  value={inputs.supplier || ""}   onChange={handleChange}  />
                 </label>
-                <button key="showdiffs" type="button" name="show_differences" onClick={showStoreDifferences} >
+                <Button key="showdiffs" name="show_differences" onClick={showStoreDifferences} >
                     Show differences 
-                </button>
-                <button key="applydiffs"  type="button" name="apply_changes" onClick={applyToStore} >
+                </Button>
+                <Button key="applydiffs" name="apply_changes" onClick={applyToStore} >
                     Apply main database values to store
-                </button>
-            </form>
+                </Button>
+          
+            </Flex>
+
         )
     }
 
-    function ChangesRow({ change , key}) {
-        var columns=[];
+    function DisplayContent() {
 
-        Object.keys(change).forEach((key, index) => {
-            //console.log(key,change[key])
-            columns.push(
-              <td> {change[key]} </td>
-            ) ;
-        });
-
-        return (
-        <>
-          <tr>
-          {columns}
-          </tr>
-          </>
-        );
-      }
-
-    function ChangesTable({changeList}) {
-
-        const rows = [];
-   
-        console.log(typeof changeList);
-        var header=false; 
-        if (changeList === [] || status !== "ready") {
-            return (
-                <>
-                    <Heading level={4}>{status}</Heading>
-                </>
-            );            
-        }
-        console.log("changelist not [] ",changeList);
-        changeList.forEach((change) => {
-            if (!header) {
-                var headercolumns=[];
-                Object.keys(change).forEach((key, index) => {
-                    headercolumns.push(
-                        <th> {key} </th>
-                    ) ;
-                });
-                rows.push(
-                    <tr> {headercolumns} </tr>
-                );
-                header=true;
-            }
-            rows.push(
-                <ChangesRow change={change} key={change.sku} />
-            );
-        });
-
-        if (rows === []) {
-            return(
-                <>
-                <Text> No differences found - store fully up-to-date</Text>
-                </>
+        if (changes.length != 0) {
+            if (type === "differences") {
+                return (
+                    <>
+                        <Heading level={4}>Differences between store (current values) and main database (new values)</Heading>
+                        <Table rowList={changes} rowkey='sku' />
+                    </>
+                )
+            } else {
+                return (
+                    <>
+                        <Heading level={4}>Results</Heading>
+                        <Table rowList={changes} rowkey='sku' />
+                    </>
+                )
+            } 
+        } else {
+             return (
+                ""
             )
         }
-        else return (
-            <>
-                <Heading level={4}>Differences between store (current values) and main database (new values)</Heading>
-                <table>
-                    <tbody>
-                    {rows}
-                    </tbody>
-                </table>
-            </>
-        );
     }
 
     console.log("changes:",changes);
@@ -224,7 +161,8 @@ const Changes = () => {
         <div style={{ marginTop: '50px' }}>
             <h2>Select store to display differences</h2>
             <InputForm/>
-            <ChangesTable changeList={changes}  />
+            <Status status={status} />
+            <DisplayContent  />
         </div>
     );
 };
