@@ -65,7 +65,7 @@ const StoreProducts = () => {
                     const message=checkServerResponse(res);
                     if (message != "") {
                         console.log("Error: ",message);
-                        setStatus("Server error: "+message);
+                        setStatus(message);
                     }
                     else {
                         setProducts(body);
@@ -94,7 +94,7 @@ const StoreProducts = () => {
                     const message=checkServerResponse(res);
                     if (message != "") {
                         console.log("Error: ",message);
-                        setStatus("Server error: "+message);
+                        setStatus(message);
                     }
                     else {
                         setResults(body);
