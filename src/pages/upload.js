@@ -16,6 +16,7 @@ export default function FileUploader() {
 
   const handleFileSelect = (e) => {
     const selectedFile = e.target.files[0];
+    console.log("selected file: ",selectedFile);
     setFile(selectedFile);
     const reader = new FileReader();
     reader.onload = () => {
@@ -104,7 +105,7 @@ export default function FileUploader() {
     if (uploadResults.length != 0) {
         return (
           <div> 
-          <h2> Results of changes to products (new values displayed)</h2>
+          <h2> Results of changes to products </h2>
            <Table rowList={uploadResults} rowkey='sku' />
            </div>
         )
