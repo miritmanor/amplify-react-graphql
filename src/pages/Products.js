@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "../App.css";
 import "@aws-amplify/ui-react/styles.css";
-import ReactDOM from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {getBaseURL,fetchProducts} from "../lambdaAccess.js";
+import {MyTable,Table} from "../mapToTable.js";
+import {OrderedDictionaryArrayTable} from "../OrderedDictionaryArrayTable.js";
 
 import { API } from "aws-amplify";
 import {
@@ -112,7 +112,6 @@ const Products = () => {
             <td> {product[key]} </td>
           ) ;
         });
-      const line = <tr> nothing </tr>
       console.log({product})
 
       return (
@@ -167,6 +166,8 @@ const Products = () => {
       );
    }
 
+  const columns=["ProductSKU","name","supplier","status","unit","regular_price","sale_price","description","short_description"];
+
   return (
     <View className="App">
       <Heading level={1}>Commiz main database</Heading>
@@ -196,7 +197,9 @@ const Products = () => {
       </View>
      */}
 
-      <ProductTable products={products} />
+       {/*<ProductTable products={products} />*/}
+      {/*<MyTable rowList={products} rowkey='sku' />*/}
+      <OrderedDictionaryArrayTable {...{products,columns }}/>
 
     </View>
   );
