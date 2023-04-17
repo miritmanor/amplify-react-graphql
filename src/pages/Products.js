@@ -23,15 +23,49 @@ import {
 
 const Products = () => {
   //const [notes, setNotes] = useState([]);
-  const [products,setProducts] = useState([])
+  const [products,setProducts] = useState([]);
+  const [filteredProducts,setFilteredProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   var supplier="";
   //supplier="";
 
   const BASEURL=getBaseURL();
 
+
+  function filterProducts(s) {
+
+  }
+
+  // only on first render - fetch products. when done it will set the products array
   useEffect(() => {
+    console.log("in useEffect - fetching");
     fetchProducts(setProducts);
   }, []);
+
+  // when products changes, initiate filteredProducts to the same array
+  useEffect(() => {
+    console.log("in useEffect - products ready");
+    setFilteredProducts(products);
+  }, [products]);
+
+  // when the user enters something in the search(filter) string - wait a bit then filter the products array and put the results in filteredProducts
+  useEffect(() => {
+    console.log("in useEffect - search");
+    const timeOutId = setTimeout(() => {
+      const p = products.filter((item) => {
+        for (var key in item) {
+          if (item[key].toLowerCase().includes(searchTerm.toLowerCase()))
+            return true;
+        }
+      });
+      setFilteredProducts(p);
+     }, 500);
+    return () => clearTimeout(timeOutId);
+  }, [searchTerm]);
+
+
+
+
 /*
   async function fetchProducts() {
     //const apiData = await API.graphql({ query: listNotes });
@@ -48,6 +82,7 @@ const Products = () => {
 
   }
 */
+/*
   async function createNote(event) {
     event.preventDefault();
     const form = new FormData(event.target);
@@ -87,90 +122,19 @@ const Products = () => {
       </form>
     );
   }
-
-    function FilterableProductTable({ products }) {
-      return (
-        <div>
-          <SearchBar />
-          <ProductTable products={products} />
-        </div>
-      );
-    }
-
-    function ProductRow({ product }) {
-      const name = product.stocked ? product.name :
-        <span style={{ color: 'red' }}>
-          {product.name}
-        </span>;
-
-        const columns=[];
-
-
-        Object.keys(product).forEach((key, index) => {
-          //console.log(key,product[key])
-          columns.push(
-            <td> {product[key]} </td>
-          ) ;
-        });
-      console.log({product})
-
-      return (
-      <>
-        <tr>
-        {columns}
-        </tr>
-        </>
-      );
-    }
-
-  function ProductTable({ products }) {
-
-      const rows = [];
-      var productstable="";
-
-
-      var header=0; 
-      products.forEach((product) => {
-        if (header == 0) {
-          var headercolumns=[];
-          Object.keys(product).forEach((key, index) => {
-            //console.log(key,product[key])
-            headercolumns.push(
-              <th> {key} </th>
-            ) ;
-          });
-          rows.push(
-           <tr>
-           {headercolumns}
-           </tr>
-          );
-          header=1;
-        }
-        rows.push(
-          <ProductRow
-            product={product}
-            key={product.sku} />
-        );
-      });
-
-    return (
-    <>
-      <Heading level={2}>Products</Heading>
-     {/*<SearchBar /> */}
-     <table>
-       <tbody>
-        {rows}
-        </tbody>
-        </table>
-      </>
-      );
-   }
+  */
 
   const columns=["ProductSKU","name","supplier","status","unit","regular_price","sale_price","description","short_description"];
+
+
 
   return (
     <View className="App">
       <Heading level={1}>Commiz main database</Heading>
+      <Flex   alignItems="center"    alignContent="flex-start" >
+        <input type="text" placeholder="Search products" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+      </Flex>
+
       {/*
       <View as="form" margin="3rem 0" onSubmit={createNote}>
         <Flex direction="row" justifyContent="center">
@@ -199,7 +163,8 @@ const Products = () => {
 
        {/*<ProductTable products={products} />*/}
       {/*<MyTable rowList={products} rowkey='sku' />*/}
-      <OrderedDictionaryArrayTable {...{products,columns }}/>
+      {/*<OrderedDictionaryArrayTable {...{products,columns }}/>*/}
+      <OrderedDictionaryArrayTable products={filteredProducts} columns={columns}/>
 
     </View>
   );
