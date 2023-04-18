@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 //import "../App.css";
 //import "@aws-amplify/ui-react/styles.css";
 import {invokeLambdaDirectly,checkServerResponse} from "../lambdaAccess.js";
-import {fetchStores} from "../lambdaAccess.js";
+import {fetchStores,fetchSuppliers} from "../lambdaAccess.js";
 import {Table} from "../mapToTable.js";
 import {Status} from "../status.js";
 import {
@@ -21,12 +21,14 @@ const Changes = () => {
     const [changes,setChanges] = useState([]);
     const [status,setStatus] = useState("");
     const [inputs, setInputs] = useState({});
-    const [stores,setStores] = useState([])
+    const [stores,setStores] = useState([]);
+    const [suppliers,setSuppliers] = useState([]);
     var type="none"; // type is none when no results available, when available - shows the type of results (differences or results)
 
     useEffect(() => {
         //Runs only on the first render
         fetchStores(setStores);
+        fetchSuppliers(setSuppliers,""); // fetch all suppliers, not filtered by store, as there is no store selection yet
       }, []);
 
     const showStoreDifferences = () => {
@@ -45,6 +47,7 @@ const Changes = () => {
             }
             console.log(queryStringParameters);
             invokeLambdaDirectly('GET','/changes/{storename+}','/changes/'+storename,{'storename':storename},queryStringParameters,"").then(res => {
+                try{
                     console.log(res);
                     const payload= JSON.parse(res.Payload);
                     const body=JSON.parse(payload.body);
@@ -59,7 +62,12 @@ const Changes = () => {
                         setChanges(body);
                     }                   
                 }
-            );
+                catch (err) {
+                    console.log(err);
+                    setStatus("Failed to get changes");
+                }
+            });
+
         }
     }
 
@@ -106,11 +114,31 @@ const Changes = () => {
             setStatus("");
             setChanges([]);
         }
+
+        const handleStoreChange = (event) => {
+            const name = event.target.name;
+            const value = event.target.value;
+            setInputs(values => ({...values, [name]: value}))
+            setStatus("");
+            setChanges([]);
+            //inputs.supplier="";
+            setSuppliers([]);
+            fetchSuppliers(setSuppliers,event.target.value);
+        }
+ 
+        const handleSupplierChange = (event) => {
+            const name = event.target.name;
+            const value = event.target.value;
+            setInputs(values => ({...values, [name]: value}))
+            setStatus("");
+            setChanges([]);
+        }
+ 
  
          return (
 
             <Flex   alignItems="center"    alignContent="flex-start" >
-                <SelectField  key="storename" name="storename" placeholder="Select store" value={inputs.storename || ""}  onChange={handleChange}>
+                <SelectField  key="storename" name="storename" placeholder="Select store" value={inputs.storename || ""}  onChange={handleStoreChange}>
                         {stores.map((store) => (
                             <option value={store.StoreName}>
                                 {store.StoreName}
@@ -118,9 +146,15 @@ const Changes = () => {
                         ))}
 
                 </SelectField>
-                <label> Supplier name (optional):
-                <input  type="text"  name="supplier"  key="supplier"  autoFocus  value={inputs.supplier || ""}   onChange={handleChange}  />
-                </label>
+                <SelectField  key="supplier" name="supplier" placeholder="All suppliers" value={inputs.supplier || ""}  onChange={handleSupplierChange}>
+                        {suppliers.map((supplier) => (
+                            <option value={supplier}>
+                                {supplier}
+                            </option>
+                        ))}
+
+                </SelectField>
+
                 <Button key="showdiffs" name="show_differences" onClick={showStoreDifferences} >
                     Show differences 
                 </Button>

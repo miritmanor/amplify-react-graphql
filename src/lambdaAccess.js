@@ -40,6 +40,23 @@ const BASEURL="https://p2qa0zr9n5.execute-api.us-east-1.amazonaws.com/dev/";  //
 
   }
 
+  export async function fetchSuppliers(setSuppliers,storeName) {
+  
+    var store="";
+    if (storeName != "") {
+      store =  '?storeName=' + storeName;
+    }
+    var commizurl = BASEURL + 'suppliers' + store;
+
+    fetch(commizurl)
+       .then(response => response.json())
+       .then(data => {
+           console.log(data);
+           setSuppliers(data);
+       })
+
+  }
+
   async function authenticateSDK() {
     try {
     const user = await Auth.currentAuthenticatedUser();
