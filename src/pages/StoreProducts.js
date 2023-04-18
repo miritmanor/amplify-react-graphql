@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 //import "@aws-amplify/ui-react/styles.css";
 import {fetchStores,invokeLambdaDirectly,checkServerResponse} from "../lambdaAccess.js";
 import {Table} from "../mapToTable.js";
+import {OrderedDictionaryArrayTable} from "../OrderedDictionaryArrayTable.js";
 import {
   Button,
   SelectField,
@@ -135,10 +136,12 @@ const StoreProducts = () => {
             )
         }
         else if (products.length != 0) {
+            const columns=["ProductSKU","name","supplier","status","unit","regular_price","sale_price","description","short_description","id_in_store","category_id_in_store","supplier_id_in_store"];
             return (
                 <>
                 <h2>List of products currently in store</h2>
-                <Table rowList={products} rowkey='ProductSKU' />
+                {/*<Table rowList={products} rowkey='ProductSKU' />*/}
+                <OrderedDictionaryArrayTable products={products} columns={columns}/>
                 </>
             )
         } else {
