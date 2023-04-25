@@ -43,7 +43,7 @@ const BASEURL="https://p2qa0zr9n5.execute-api.us-east-1.amazonaws.com/dev/";  //
   export async function fetchSuppliers(setSuppliers,storeName) {
   
     var store="";
-    if (storeName != "") {
+    if (storeName !== "") {
       store =  '?storeName=' + storeName;
     }
     var commizurl = BASEURL + 'suppliers' + store;
@@ -56,7 +56,7 @@ const BASEURL="https://p2qa0zr9n5.execute-api.us-east-1.amazonaws.com/dev/";  //
        })
 
   }
-
+/*
   async function authenticateSDK() {
     try {
     const user = await Auth.currentAuthenticatedUser();
@@ -74,12 +74,13 @@ const BASEURL="https://p2qa0zr9n5.execute-api.us-east-1.amazonaws.com/dev/";  //
     console.log('Error authenticating to AWS SDK', error);
   }
 }
-
+*/
 
 export async function invokeLambdaDirectly(httpMethod,resource,path,pathParameters,queryStringParameters,body) {
 
     AWS.config.update({region:REGION});
     const user = await Auth.currentAuthenticatedUser();
+    // eslint-disable-next-line
     const { accessToken, idToken } = user.signInUserSession;
     //var credentials = await Auth.currentCredentials();
     //console.log('AWS.config: ',AWS.config);
@@ -126,27 +127,50 @@ export async function invokeLambdaDirectly(httpMethod,resource,path,pathParamete
 
   export function checkServerResponse(res) {
     console.log(res);
+    
+    var displayMessage="";
     try {
-      const payload= JSON.parse(res.Payload);
-      if (res.StatusCode != 200) {
-          return("Failed "+payload);
-      } else {
-          const body=JSON.parse(payload.body);
-            if (typeof body ==='string') {
-              return(body);
-            } 
-            else {
-              if (body.length == 0) {
-                // empty results
-                return("no results to show");
-              } else {
-                return("");
-              }
+      switch (typeof res) {
+        case 'object':
+          if (res.StatusCode !== 200) {
+            displayMessage = "Failed "+res.toString();
           }
+          if (res.hasOwnProperty('Payload')) {
+            console.log(res.Payload);
+            console.log(typeof res.Payload);
+            if (typeof res.Payload == 'string') {
+              try {
+                const payload= JSON.parse(res.Payload);
+                try {
+                  // eslint-disable-next-line
+                  const body=JSON.parse(payload.body);
+                  console.log("suucessfully parsed body")
+                  displayMessage="";  // empty message is a sign for success
+                } catch (err) {
+                  console.log("failed to parse body");
+                  console.log("returning payload ",payload)
+                  displayMessage = JSON.stringify(payload);
+                }
+              } catch (error) {
+                console.log("Failed to parse payload");
+                displayMessage = res.Payload;
+              }
+            }
+          }
+          break;
+        case 'string':
+          displayMessage = res;
+          break;
+        default:
+          displayMessage = res;
       }
     } catch (error) {
-      console.log(error);
-      return(error);
+        console.log(error);
+        displayMessage = error;
+    } finally {
+      console.log("displayMessage:",displayMessage);
+      console.log("as a string:",displayMessage.toString());
+      return displayMessage.toString();
     }
   }
   

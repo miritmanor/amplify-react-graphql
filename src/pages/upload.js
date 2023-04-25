@@ -1,4 +1,4 @@
-import AWS from 'aws-sdk';
+//import AWS from 'aws-sdk';
 import { Storage } from 'aws-amplify';
 import { useState } from 'react';
 import {invokeLambdaDirectly} from "../lambdaAccess.js";
@@ -7,10 +7,10 @@ import {Status} from "../status.js";
 
 
 export default function FileUploader() {
-  const s3 = new AWS.S3();
-  const [fileUrl, setfileUrl] = useState(null);
+  //const s3 = new AWS.S3();
+  //const [fileUrl, setfileUrl] = useState(null);
   const [file, setFile] = useState(null);
-  const [fileContents, setFileContents] = useState(null);
+  //const [fileContents, setFileContents] = useState(null);
   const [uploadResults, setUploadResults] = useState("");
   const [status,setStatus] = useState("");
 
@@ -20,7 +20,7 @@ export default function FileUploader() {
     setFile(selectedFile);
     const reader = new FileReader();
     reader.onload = () => {
-      setFileContents( reader.result);
+      //setFileContents( reader.result);
       setUploadResults("");
     };
     reader.readAsBinaryString(selectedFile);
@@ -102,7 +102,7 @@ export default function FileUploader() {
 
   function DisplayContent() {
 
-    if (uploadResults.length != 0) {
+    if (uploadResults.length !== 0) {
         return (
           <div> 
           <h2> Results of changes to products </h2>
@@ -127,11 +127,13 @@ export default function FileUploader() {
           <button onClick={applyChangesThroughS3}>Apply changes to products main table</button> 
         </div>
       )}
+      {/*
       {fileUrl && (
         <div style={{ marginTop: '10px' }}>
           <img src={fileUrl} alt="uploaded" />
         </div>
       )}
+      */}
       <Status status={status} />
       <DisplayContent/>
     </div>

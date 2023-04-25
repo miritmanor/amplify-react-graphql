@@ -8,11 +8,11 @@ import {
   Button,
   SelectField,
   Flex,
-  Heading,
-  Text,
-  TextField,
+  //Heading,
+  //Text,
+  //TextField,
   View,
-  withAuthenticator,
+  //withAuthenticator,
 } from "@aws-amplify/ui-react";
 import {Status} from "../status.js";
 
@@ -62,7 +62,7 @@ const StoreProducts = () => {
                 invokeLambdaDirectly('GET','/products/{storename+}','/products/'+inputs.storename,{'storename':inputs.storename},{},"").then(res => {
                     console.log(res);
                     const message=checkServerResponse(res);
-                    if (message != "") {
+                    if (message !== "") {
                         console.log("Error: ",message);
                         setStatus(message);
                     }
@@ -91,7 +91,8 @@ const StoreProducts = () => {
                 invokeLambdaDirectly('POST','/products/import','/products/import',{},{'store':inputs.storename},"").then(res => {
                     console.log(res);
                     const message=checkServerResponse(res);
-                    if (message != "") {
+                    console.log("message:",message);
+                    if (message !== "") {
                         console.log("Error: ",message);
                         setStatus(message);
                     }
@@ -127,7 +128,9 @@ const StoreProducts = () => {
 
     function DisplayContent() {
 
-        if (results.length != 0) {
+        console.log("in DisplayContent");
+        if (results.length !== 0) {
+            console.log("there are results");
             return (
                 <>
                 <h2>Results for products import from store</h2>
@@ -135,7 +138,8 @@ const StoreProducts = () => {
                 </>
             )
         }
-        else if (products.length != 0) {
+        else if (products.length !== 0) {
+            console.log("there are products");
             const columns=["ProductSKU","name","supplier","status","unit","regular_price","sale_price","description","short_description","id_in_store","category_id_in_store","supplier_id_in_store"];
             return (
                 <>
@@ -145,9 +149,8 @@ const StoreProducts = () => {
                 </>
             )
         } else {
-             return (
-                " "
-            )
+             console.log("nothing to show");
+             return ( <>  </> );
         }
     }
 

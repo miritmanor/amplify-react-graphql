@@ -2,11 +2,13 @@
 
 export function Status({status}) {
 
-    if (status == 'ready') {
+    console.log("status:",status);
+    const s = status.toString();
+    if (s === 'ready') {
         return ("");
     }
     return ( 
-        <h4> {status} </h4>
+        <h4> {s} </h4>
     );
 }
 

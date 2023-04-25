@@ -1,24 +1,16 @@
 import React, { useState, useEffect } from "react";
 import "../App.css";
 import "@aws-amplify/ui-react/styles.css";
-import {getBaseURL,fetchProducts} from "../lambdaAccess.js";
-import {MyTable,Table} from "../mapToTable.js";
+import {fetchProducts} from "../lambdaAccess.js";
+//import {MyTable,Table} from "../mapToTable.js";
 import {OrderedDictionaryArrayTable} from "../OrderedDictionaryArrayTable.js";
 
-import { API } from "aws-amplify";
+//import { API } from "aws-amplify";
 import {
-  Button,
   Flex,
   Heading,
-  Text,
-  TextField,
   View,
-  withAuthenticator,
 } from "@aws-amplify/ui-react";
-import {
-  createNote as createNoteMutation,
-  deleteNote as deleteNoteMutation,
-} from "../graphql/mutations";
 
 
 const Products = () => {
@@ -26,15 +18,13 @@ const Products = () => {
   const [products,setProducts] = useState([]);
   const [filteredProducts,setFilteredProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  var supplier="";
+  //var supplier="";
   //supplier="";
 
-  const BASEURL=getBaseURL();
+  //const BASEURL=getBaseURL();
 
 
-  function filterProducts(s) {
 
-  }
 
   // only on first render - fetch products. when done it will set the products array
   useEffect(() => {
@@ -57,11 +47,12 @@ const Products = () => {
           if (item[key].toLowerCase().includes(searchTerm.toLowerCase()))
             return true;
         }
+        return false;
       });
       setFilteredProducts(p);
      }, 500);
     return () => clearTimeout(timeOutId);
-  }, [searchTerm]);
+  }, [searchTerm,products]);
 
 
 

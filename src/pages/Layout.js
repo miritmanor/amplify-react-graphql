@@ -16,7 +16,10 @@ const Layout = () => {
             <Link to="/upload">Upload changes file</Link>
           </li>       
           <li>
-            <Link to="/changes">View and apply changes</Link>
+            <Link to="/compareToStore">View differences</Link>
+          </li>
+          <li>
+            <Link to="/applyChanges">Apply changes to stores</Link>
           </li>
        </ul>
       </nav>
