@@ -22,19 +22,10 @@ const ApplyChanges = () => {
     const [inputs, setInputs] = useState({});
     const [stores,setStores] = useState([]);
     const [suppliers,setSuppliers] = useState([]);
-
-
-    //const [checkedItems, setCheckedItems] = React.useState([false, false]);
-    //const checkedItemsRef = React.useRef(null);
-    //const [allChecked, setAllChecked] = React.useState(false);
-    const [checkStores,setCheckStores] = useState([]);
+    const [selectedStores, setSelectedStores] = useState([]);
 
     const [storeUpdateStatus,setStoreUpdateStatus] = useState([])
     const [storeUpdateResults,setStoreUpdateResults] = useState([])
-
-    //var type="none"; // type is none when no results available, when available - shows the type of results (differences or results)
-    //var checkStores={};
-
 
 
     useEffect(() => {
@@ -43,6 +34,7 @@ const ApplyChanges = () => {
         fetchSuppliers(setSuppliers,""); // fetch all suppliers, not filtered by store, as there is no store selection yet
       }, []);
 
+      /*
     useEffect(() => {
 
        var checked=[];
@@ -54,6 +46,7 @@ const ApplyChanges = () => {
         console.log("initialized checkStores:",checkStores);
 // eslint-disable-next-line
     }, [stores]);
+    */
 
 
     async function applyOneStore(storename,supplier) {
@@ -64,6 +57,8 @@ const ApplyChanges = () => {
             const queryStringParameters={
                 supplier: supplier
             }
+            storeUpdateStatus[storename]="Waiting for store "+ storename;
+     
             const response = await invokeLambdaDirectly('PUT','/changes/{storename+}','/changes/'+storename,{'storename':storename},queryStringParameters,"");
             console.log(response);
 
@@ -76,15 +71,25 @@ const ApplyChanges = () => {
             else {
                 const payload= JSON.parse(response.Payload);
                 const body=JSON.parse(payload.body);
-                console.log(body);
-                storeUpdateStatus[storename]="Completed applying to store "+ storename;
-                storeUpdateResults[storename]=body;
+                console.log("body:",body);
+                if (body.length ===0) {
+                    storeUpdateStatus[storename]="No differences found for store "+ storename ;
+                } else {
+                    storeUpdateStatus[storename]="Completed applying to store "+ storename;
+                }
+
+                // prepare to display - add to each line also a 'store' attribute
+                const storeResults = body.map( (line) => (  
+                    {...line, Store:storename}
+                ));
+
+                storeUpdateResults[storename]=storeResults;
             }
             return(response);
         } catch (error) {
             console.error(error);
             const response=error;
-            storeUpdateStatus[storename]="Failed applying to store "+ storename + ": " + error;
+            storeUpdateStatus[storename]="Problems while applying to store "+ storename + ": " + error;
             storeUpdateResults[storename]=[];
             return(response);
         }
@@ -102,9 +107,9 @@ const ApplyChanges = () => {
      const displayMultipleResults = () => {
 
         var changelist=[];
-        console.log(changelist);
+        //console.log(changelist);
         for (var i in storeUpdateResults) {
-            console.log("i:",i," results:",storeUpdateResults[i]);
+            //console.log("i:",i," results:",storeUpdateResults[i]);
             changelist = changelist.concat(storeUpdateResults[i]);
         }
         console.log(changelist);
@@ -117,19 +122,12 @@ const ApplyChanges = () => {
         //setInputs(values => ({...values,  applyToStore: true }));
         console.log("inputs:",inputs);
 
-        var storesToUpdate=[];
-        for (var selected in checkStores) {
-            if (checkStores[selected] === true) {
-                storesToUpdate.push(selected);
-            }
-        }
-        console.log(storesToUpdate);
+        console.log("selected stores: ",selectedStores);
 
-
-        if (storesToUpdate.length !== 0) {
+        if (selectedStores.length !== 0) {
             var message = "Applying changes to stores: ";
-            for (var i in storesToUpdate) {
-                message = message+ storesToUpdate[i] + ", ";
+            for (var i in selectedStores) {
+                message = message+ selectedStores[i] + ", ";
             }
             message = message + "..."
     
@@ -137,8 +135,9 @@ const ApplyChanges = () => {
 
             setStoreUpdateStatus([]);
             setStoreUpdateResults([]);
-            for (i in storesToUpdate) {
-                var storename=storesToUpdate[i];
+            setChanges([]);
+            for (i in selectedStores) {
+                var storename=selectedStores[i];
 
                 applyOneStore(storename,inputs.supplier).then(res => {
                     console.log(res);
@@ -172,65 +171,31 @@ const ApplyChanges = () => {
 
 
         const CheckboxSelectStores = () => {
+            console.log("in CheckboxSelectStores:" );
+            
 
-            //const allChecked = checkedItems.every(Boolean);
-            //const isIndeterminate = checkedItems.some(Boolean) && !allChecked;
-
-         
-            //if (isIndeterminate) {
-                //console.log("isIndeterminate");
-              //checkedItemsRef.current = [...checkedItems];
-            //}
-            /*
-            const handleAllStoresSelection = () => { 
-
-                const cc=[];
-                if (allChecked) {
-                    setAllChecked(false);
-                    for (var c in checkStores) {
-                        cc[c] = false;
-                    }
-                    setCheckStores(cc);
-                } else {
-                    setAllChecked(true);
-                    for (c in checkStores) {
-                        cc[c] = true;
-                    }  
-                    setCheckStores(cc);                  
-                }
-
-                console.log(checkStores);
-                
-              if (isIndeterminate) {
-                //setCheckedItems([true, true]);
-              } else if (allChecked) {
-                //setCheckedItems([false, false]);
-              } else if (checkedItemsRef.current) {
-                //setCheckedItems(checkedItemsRef.current);
-              } else {
-                //setCheckedItems([true, true]);
-              }
-             
-            };
-          
-         */
-
-            const handleStoreSelecteionChange = (e) => {
+            const handleStoreSelectionChange = (e) => {
                 const name = e.target.name;
-                const value = e.target.value;
-                console.log(name,value);
-                checkStores[name] = !checkStores[name];
+                //const value = e.target.value;
+                //console.log("store selection change: ",name,value);
+                //checkStores[name] = !checkStores[name];
                 //setAllChecked(false);
-                console.log(checkStores);
-                /*
-              const newCheckedItems = [checkedItems[0], e.target.checked];
-              if (!newCheckedItems.some(Boolean) || newCheckedItems.every(Boolean)) {
-                checkedItemsRef.current = null;
-              }
-              setCheckedItems(newCheckedItems);
-              */
+                //console.log("changed to:",checkStores);
+
+                if (selectedStores.includes(name)) {
+                    setSelectedStores(selectedStores.filter(id => id !== name));
+                } else {
+                    setSelectedStores([...selectedStores, name]);
+                }
+                  
             };
+
+            useEffect(() => {
+                //console.log("in useEffect of CheckboxSelectStores ",checkStores);
+
+              }, []);
           
+ 
             return (
               <Flex direction="row" gap="0" paddingTop="5px">
                 {/*}
@@ -246,7 +211,7 @@ const ApplyChanges = () => {
                 <Text paddingTop="20px">Select stores</Text>
                 <View paddingLeft="20px" paddingTop="10px" paddingRight="30px">
                     {stores.map((store) => (
-                        <CheckboxField value={store.StoreName} name={store.StoreName} label={store.StoreName} checked={checkStores[store]} onChange={handleStoreSelecteionChange}/>
+                        <CheckboxField value={store.StoreName} name={store.StoreName} label={store.StoreName} checked={selectedStores.includes(store.StoreName)} onChange={handleStoreSelectionChange}/>
                     ))} 
                 </View>
               </Flex>
@@ -272,36 +237,20 @@ const ApplyChanges = () => {
             setChanges([]);
         }
  
- 
-         return (
-
+        return (
             <Flex   alignItems="center"    alignContent="flex-start" >
-
                 <SelectField  key="supplier" name="supplier" placeholder="All suppliers" value={inputs.supplier || ""}  onChange={handleSupplierChange}>
                         {suppliers.map((supplier) => (
                             <option value={supplier}>
                                 {supplier}
                             </option>
                         ))}
-
                 </SelectField>
                 <CheckboxSelectStores></CheckboxSelectStores>
-{/*
-                <Multiselect  key="storename" name="storename" placeholder="Select store" value={inputs.storename || ""}  onChange={handleStoreChange}>
-                        {stores.map((store) => (
-                            <option value={store.StoreName}>
-                                {store.StoreName}
-                            </option>
-                        ))}
-
-                </Multiselect>
-                        */}
                 <Button key="applydiffs" name="apply_changes" onClick={applyToStores} >
                     Apply changes
                 </Button>
-          
             </Flex>
-
         )
     }
 
