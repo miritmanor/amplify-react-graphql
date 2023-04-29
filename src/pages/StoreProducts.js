@@ -145,7 +145,7 @@ const StoreProducts = () => {
                 <>
                 <h2>List of products currently in store</h2>
                 {/*<Table rowList={products} rowkey='ProductSKU' />*/}
-                <OrderedDictionaryArrayTable products={products} columns={columns}/>
+                <OrderedDictionaryArrayTable items={products} columns={columns}/>
                 </>
             )
         } else {
