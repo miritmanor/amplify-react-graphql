@@ -42,10 +42,15 @@ const Products = () => {
   useEffect(() => {
     console.log("in useEffect - search");
     const timeOutId = setTimeout(() => {
+
       const p = products.filter((item) => {
+        //console.log(item);
         for (var key in item) {
-          if (item[key].toLowerCase().includes(searchTerm.toLowerCase()))
-            return true;
+          if (typeof item[key] === 'string') {
+            if (item[key].toLowerCase().includes(searchTerm.toLowerCase())) {
+              return true;
+            }
+          }
         }
         return false;
       });
@@ -154,8 +159,7 @@ const Products = () => {
 
        {/*<ProductTable products={products} />*/}
       {/*<MyTable rowList={products} rowkey='sku' />*/}
-      {/*<OrderedDictionaryArrayTable {...{products,columns }}/>*/}
-      <OrderedDictionaryArrayTable products={filteredProducts} columns={columns}/>
+      <OrderedDictionaryArrayTable items={filteredProducts} columns={columns}/>
 
     </View>
   );

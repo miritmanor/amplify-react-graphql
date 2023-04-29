@@ -1,7 +1,7 @@
 import React from 'react';
 
 export function OrderedDictionaryArrayTable(props) {
-  const dictionaries = props.products;
+  const dictionaries = props.items;
   const columnOrder = props.columns;
 
   if (dictionaries.length ===0) {
