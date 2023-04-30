@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import {invokeLambdaDirectly,checkServerResponse} from "../lambdaAccess.js";
 import {fetchStores,fetchSuppliers} from "../lambdaAccess.js";
-import {Table} from "../mapToTable.js";
+import { CSVLink } from "react-csv";
+
+import {OrderedDictionaryArrayTable} from "../OrderedDictionaryArrayTable.js";
 import {Status} from "../status.js";
 import {
     Button,
@@ -127,10 +129,15 @@ const CompareToStore = () => {
     function DisplayContent() {
 
         if (changes.length !== 0) {
+            const columns=["SKU","Name","Supplier","Details"];
             return (
                 <>
                     <Heading level={4}>Differences between store (current values) and main database (new values)</Heading>
-                    <Table rowList={changes} rowkey='sku' />
+                    <Flex   alignItems="center"    alignContent="flex-start" paddingTop="10px" paddingBottom="10px">
+                        <CSVLink data={changes} headers={columns} filename={inputs.storename+"-changes.csv"} className="amplify-button amplify-field-group__control">  Download as CSV</CSVLink>
+                    </Flex>
+                    <OrderedDictionaryArrayTable items={changes} columns={columns}/>
+                    {/*<Table rowList={changes} rowkey='sku' /> */}
                 </>
             )
         } else {

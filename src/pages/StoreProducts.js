@@ -1,18 +1,13 @@
 import React, { useState, useEffect } from "react";
-//import "../App.css";
-//import "@aws-amplify/ui-react/styles.css";
+
 import {fetchStores,invokeLambdaDirectly,checkServerResponse} from "../lambdaAccess.js";
-import {Table} from "../mapToTable.js";
 import {OrderedDictionaryArrayTable} from "../OrderedDictionaryArrayTable.js";
+import { CSVLink } from "react-csv";
 import {
   Button,
   SelectField,
   Flex,
-  //Heading,
-  //Text,
-  //TextField,
   View,
-  //withAuthenticator,
 } from "@aws-amplify/ui-react";
 import {Status} from "../status.js";
 
@@ -131,10 +126,16 @@ const StoreProducts = () => {
         console.log("in DisplayContent");
         if (results.length !== 0) {
             console.log("there are results");
+            const columns=["sku","result"];
+
             return (
                 <>
                 <h2>Results for products import from store</h2>
-                <Table rowList={results} rowkey='sku' />
+                <Flex   alignItems="center"    alignContent="flex-start" paddingTop="10px" paddingBottom="10px">
+                    <CSVLink data={results} headers={columns} filename={inputs.storename+"-import-results.csv"} className="amplify-button amplify-field-group__control">  Download results as CSV</CSVLink>
+                </Flex>
+                {/*<Table rowList={results} rowkey='sku' /> */}
+                <OrderedDictionaryArrayTable items={results} columns={columns}/>
                 </>
             )
         }
@@ -144,7 +145,9 @@ const StoreProducts = () => {
             return (
                 <>
                 <h2>List of products currently in store</h2>
-                {/*<Table rowList={products} rowkey='ProductSKU' />*/}
+                <Flex   alignItems="center"    alignContent="flex-start" paddingTop="10px" paddingBottom="10px">
+                    <CSVLink data={products} headers={columns} filename={inputs.storename+"-products.csv"} className="amplify-button amplify-field-group__control">  Download as CSV</CSVLink>
+                </Flex>
                 <OrderedDictionaryArrayTable items={products} columns={columns}/>
                 </>
             )
