@@ -4,7 +4,7 @@ export function OrderedDictionaryArrayTable(props) {
   const dictionaries = props.items;
   const columnOrder = props.columns;
 
-  if (dictionaries.length ===0) {
+  if (dictionaries && dictionaries.length ===0) {
     return <> </>
   }
 

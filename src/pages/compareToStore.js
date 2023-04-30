@@ -31,10 +31,11 @@ const CompareToStore = () => {
         //setInputs(values => ({...values,  showStoreDifferences: true }));
         console.log("inputs:",inputs);
         setStatus("Working... waiting for results");
+        setChanges([]);
         if (!Object.hasOwn(inputs, 'storename') || !inputs.storename) {
             console.log("missing store name");
             setStatus("Store name missing");
-            setChanges([]);
+            //setChanges([]);
         } else {
             const storename=inputs.storename;
             const queryStringParameters={
