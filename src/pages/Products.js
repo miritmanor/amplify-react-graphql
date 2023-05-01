@@ -129,6 +129,7 @@ const Products = () => {
   */
 
   const columns=["ProductSKU","name","supplier","status","unit","regular_price","sale_price","description","short_description"];
+  const csvcolumns=["ProductSKU","name","supplier","status","unit","regular_price","sale_price"];
 
 
 
@@ -164,7 +165,7 @@ const Products = () => {
      */}
       <Flex   alignItems="center"    alignContent="flex-start" paddingTop="10px" paddingBottom="20px">
         <input type="text" placeholder="Search products" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-        <CSVLink data={filteredProducts} headers={columns} filename={"main-database-products"+searchTerm+".csv"} className="amplify-button amplify-field-group__control">  Download as CSV</CSVLink>
+        <CSVLink data={filteredProducts} headers={csvcolumns} filename={"main-database-products"+searchTerm+".csv"} enclosingCharacter={``} className="amplify-button amplify-field-group__control">  Download as CSV</CSVLink>
       </Flex>
 
       <OrderedDictionaryArrayTable items={filteredProducts} columns={columns}/>

@@ -141,12 +141,12 @@ const StoreProducts = () => {
         }
         else if (products.length !== 0) {
             console.log("there are products");
-            const columns=["ProductSKU","name","supplier","status","unit","regular_price","sale_price","description","short_description","id_in_store","category_id_in_store","supplier_id_in_store"];
+            const columns=["ProductSKU","name","supplier","status","unit","regular_price","sale_price","id_in_store","category_id_in_store","supplier_id_in_store"];
             return (
                 <>
                 <h2>List of products currently in store</h2>
                 <Flex   alignItems="center"    alignContent="flex-start" paddingTop="10px" paddingBottom="10px">
-                    <CSVLink data={products} headers={columns} filename={inputs.storename+"-products.csv"} className="amplify-button amplify-field-group__control">  Download as CSV</CSVLink>
+                    <CSVLink data={products} headers={columns} filename={inputs.storename+"-products.csv"} enclosingCharacter={``}  className="amplify-button amplify-field-group__control">  Download as CSV</CSVLink>
                 </Flex>
                 <OrderedDictionaryArrayTable items={products} columns={columns}/>
                 </>
