@@ -10,7 +10,6 @@ const BASEURL="https://p2qa0zr9n5.execute-api.us-east-1.amazonaws.com/dev/";  //
   }
 
   export async function fetchProducts(setProducts) {
-    //const apiData = await API.graphql({ query: listNotes });
     var commizurl = BASEURL + 'products';
     /*
     if (supplier != "") {
@@ -26,6 +25,57 @@ const BASEURL="https://p2qa0zr9n5.execute-api.us-east-1.amazonaws.com/dev/";  //
 
   }
 
+  export async function fetchProduct(sku) {
+    var commizurl = BASEURL + 'products/' + sku;
+
+    console.log("In fetchProduct ",commizurl);
+    const res = await fetch(commizurl)
+    return res.json();
+    /* 
+       .then(response => response.json())
+       .then(data => {
+           console.log("data:",data);
+           return(data);
+       })
+       */
+
+  }
+
+  export async function modifyProduct(sku,changes) {
+    var commizurl = BASEURL + 'products/' + sku + '?';
+
+    if (changes.length === 0) {
+      console.log("nothing to change");
+      return {};
+    }
+    var first=true;
+    for (var attr in changes) {
+      if (!first) {
+        commizurl = commizurl + '&';
+      }
+      commizurl = commizurl + attr + '=' + changes[attr];
+      first=false;
+    }
+    console.log("In modifyProduct ",commizurl);
+    try {
+      const res = await fetch(commizurl,{method: "PUT"});
+      const result = await res.json();
+      console.log(result);
+      return (result);
+    }
+    catch (err) {
+      return("result: " +err);
+    }
+
+    /* 
+       .then(response => response.json())
+       .then(data => {
+           console.log("data:",data);
+           return(data);
+       })
+       */
+
+  }
 
   export async function fetchStores(setStores) {
   
