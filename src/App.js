@@ -3,7 +3,7 @@ import "./App.css";
 //import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {
-  Button,
+  Button, 
   withAuthenticator,
 } from "@aws-amplify/ui-react";
 import Layout from "./pages/Layout";
@@ -13,6 +13,8 @@ import StoreProducts from "./pages/StoreProducts";
 import FileUploader from "./pages/upload";
 import CompareToStore from "./pages/compareToStore";
 import ApplyChanges from "./pages/applyChanges";
+import Suppliers from "./pages/suppliers";
+import Stores from "./pages/stores";
 
 const App = ({ signOut }) => {
   return (
@@ -25,6 +27,8 @@ const App = ({ signOut }) => {
           <Route path="upload" element={<FileUploader />} />
           <Route path="compareToStore" element={<CompareToStore />} />
           <Route path="applyChanges" element={<ApplyChanges />} />
+          <Route path="suppliers" element={<Suppliers />} />
+          <Route path="stores" element={<Stores />} />
           <Route path="*" element={<NoPage />} />
         </Route>
       </Routes>

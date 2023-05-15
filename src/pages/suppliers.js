@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../App.css";
 import "@aws-amplify/ui-react/styles.css";
-import {fetchSuppliers} from "../lambdaAccess.js";
+import {fetchSuppliersFullDetails} from "../lambdaAccess.js";
 import {OrderedDictionaryArrayTable} from "../OrderedDictionaryArrayTable.js";
 
 import {
@@ -20,7 +20,7 @@ const Suppliers = () => {
   // only on first render - fetch suppliers. when done it will set the suppliers array
   useEffect(() => {
     console.log("in useEffect - fetching");
-    fetchSuppliers(setSuppliers,"");
+    fetchSuppliersFullDetails(setSuppliers,"");
   }, []);
 
   // when suppliers changes, initiate filteredSuppliers to the same array
@@ -46,12 +46,12 @@ const Suppliers = () => {
   }, [searchTerm,suppliers]);
 
 
-  const columns=["supplier_name","id_in_store"];
+  const columns=["supplier_name","stores"];
 
 
   return (
     <View className="App">
-      <Heading level={1}>Commiz main database suppliers </Heading>
+      <Heading paddingTop="5px" paddingBottom="20px" level={4}>Commiz suppliers in main DB </Heading>
       <Flex   alignItems="center"    alignContent="flex-start" >
         <input type="text" placeholder="Search suppliers" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
       </Flex>

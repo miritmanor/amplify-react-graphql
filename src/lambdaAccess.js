@@ -106,6 +106,20 @@ const BASEURL="https://p2qa0zr9n5.execute-api.us-east-1.amazonaws.com/dev/";  //
        })
 
   }
+
+  export async function fetchSuppliersFullDetails(setSuppliers) {
+  
+
+    var commizurl = BASEURL + 'suppliers?fullDetails=1';
+
+    fetch(commizurl)
+       .then(response => response.json())
+       .then(data => {
+           console.log(data);
+           setSuppliers(data);
+       })
+
+  }
 /*
   async function authenticateSDK() {
     try {

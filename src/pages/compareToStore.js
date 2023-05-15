@@ -132,7 +132,7 @@ const CompareToStore = () => {
             const columns=["SKU","Name","Supplier","Details"];
             return (
                 <>
-                    <Heading level={4}>Differences between store (current values) and main database (new values)</Heading>
+                    <Heading level={4}>Differences between store and main database </Heading>
                     <Flex   alignItems="center"    alignContent="flex-start" paddingTop="10px" paddingBottom="10px">
                         <CSVLink data={changes} headers={columns} filename={inputs.storename+"-changes.csv"} className="amplify-button amplify-field-group__control">  Download as CSV</CSVLink>
                     </Flex>

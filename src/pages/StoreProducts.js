@@ -115,7 +115,7 @@ const StoreProducts = () => {
                     Show products 
                 </Button>
                 <Button   key="importproducts" name="import_products" onClick={importProducts} >
-                    Import from store to main database 
+                    Sync WordPress store to DB
                 </Button>            
             </Flex>
         )
