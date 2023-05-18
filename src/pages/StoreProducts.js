@@ -10,13 +10,17 @@ import {
   View,
 } from "@aws-amplify/ui-react";
 import {Status} from "../status.js";
-
+import {isInSearchTerm} from "../search.js"
 
 
 const StoreProducts = () => {
   
     const [products,setProducts] = useState([]);
+    const [showProducts,setShowProducts] = useState(null);
+    const [filteredProducts,setFilteredProducts] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
     const [results,setResults] = useState([]);
+    const [showResults,setShowResults] = useState(null);
     const [inputs, setInputs] = useState({});
     const [status,setStatus] = useState("");
     const [stores,setStores] = useState([]);
@@ -29,6 +33,25 @@ const StoreProducts = () => {
         fetchStores(setStores);
      }, []);
 
+       // when products changes, initiate filteredProducts to the same array
+    useEffect(() => {
+        console.log("in useEffect - products ready");
+        setFilteredProducts(products);
+    }, [products]);
+
+    // when the user enters something in the search(filter) string - wait a bit then filter the products array and put the results in filteredProducts
+    useEffect(() => {
+        console.log("in useEffect - search");
+        const timeOutId = setTimeout(() => {
+            const p = products.filter((item) => {
+                //console.log(item);
+                return (isInSearchTerm(item,searchTerm));
+
+            });
+            setFilteredProducts(p);
+        }, 500);
+        return () => clearTimeout(timeOutId);
+    }, [searchTerm,products]);
 
     function InputForm() {
 
@@ -40,7 +63,9 @@ const StoreProducts = () => {
             const value = event.target.value;
             setInputs(values => ({...values, [name]: value}))
             setProducts([]);
+            setShowProducts(false)
             setResults([]);
+            setShowResults(false);
         }
  
         const showProducts = () => {
@@ -50,9 +75,12 @@ const StoreProducts = () => {
                 console.log("missing store name");
                 setStatus("Store name missing");
                 setProducts([]);
+                setShowProducts(false);
             } else {
                 setProducts([]);
+                setShowProducts(false);
                 setResults([]);
+                setShowResults(false);
                 setStatus("Waiting for results");
                 invokeLambdaDirectly('GET','/products/{storename+}','/products/'+inputs.storename,{'storename':inputs.storename},{},"").then(res => {
                     console.log(res);
@@ -65,6 +93,7 @@ const StoreProducts = () => {
                         const payload= JSON.parse(res.Payload);
                         const body=JSON.parse(payload.body);
                         setProducts(body);
+                        setShowProducts(true);
                         setStatus("ready");
                     }
                 }
@@ -79,9 +108,12 @@ const StoreProducts = () => {
                 console.log("missing store name");
                 setStatus("Store name missing");
                 setProducts([]);
+                setShowProducts(false);
             } else {
                 setProducts([]);
+                setShowProducts(false);
                 setResults([]);
+                setShowResults(false);
                 setStatus("Waiting for results");
                 invokeLambdaDirectly('POST','/products/import','/products/import',{},{'store':inputs.storename},"").then(res => {
                     console.log(res);
@@ -95,6 +127,7 @@ const StoreProducts = () => {
                         const payload= JSON.parse(res.Payload);
                         const body=JSON.parse(payload.body);
                         setResults(body);
+                        setShowResults(true);
                         setStatus("ready");
                     }
                 } );
@@ -122,39 +155,32 @@ const StoreProducts = () => {
     }
 
     function DisplayContent() {
+        const productColumns=["ProductSKU","name","supplier","status","unit","regular_price","sale_price","id_in_store","category_id_in_store","supplier_id_in_store"];
+        const resultColumns=["sku","result"];
 
-        console.log("in DisplayContent");
-        if (results.length !== 0) {
-            console.log("there are results");
-            const columns=["sku","result"];
-
-            return (
-                <>
+        return(
+            <>
+                {showResults && 
+                (<> 
                 <h2>Results for products import from store</h2>
                 <Flex   alignItems="center"    alignContent="flex-start" paddingTop="10px" paddingBottom="10px">
-                    <CSVLink data={results} headers={columns} filename={inputs.storename+"-import-results.csv"} className="amplify-button amplify-field-group__control">  Download results as CSV</CSVLink>
+                    <CSVLink data={results} headers={resultColumns} filename={inputs.storename+"-import-results.csv"} className="amplify-button amplify-field-group__control">  Download results as CSV</CSVLink>
                 </Flex>
-                {/*<Table rowList={results} rowkey='sku' /> */}
-                <OrderedDictionaryArrayTable items={results} columns={columns}/>
-                </>
-            )
-        }
-        else if (products.length !== 0) {
-            console.log("there are products");
-            const columns=["ProductSKU","name","supplier","status","unit","regular_price","sale_price","id_in_store","category_id_in_store","supplier_id_in_store"];
-            return (
-                <>
-                <h2>List of products currently in store</h2>
-                <Flex   alignItems="center"    alignContent="flex-start" paddingTop="10px" paddingBottom="10px">
-                    <CSVLink data={products} headers={columns} filename={inputs.storename+"-products.csv"} enclosingCharacter={``}  className="amplify-button amplify-field-group__control">  Download as CSV</CSVLink>
-                </Flex>
-                <OrderedDictionaryArrayTable items={products} columns={columns}/>
-                </>
-            )
-        } else {
-             console.log("nothing to show");
-             return ( <>  </> );
-        }
+                <OrderedDictionaryArrayTable items={results} columns={resultColumns}/>
+                </>)}
+                {showProducts &&
+                ( <>
+                    <h2>List of products currently in store</h2>
+                    <Flex   alignItems="center"    alignContent="flex-start" paddingTop="10px" paddingBottom="10px">
+                        <input type="text" placeholder="Search products" autoFocus value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                        <CSVLink data={filteredProducts} headers={productColumns} filename={inputs.storename+"-products.csv"} enclosingCharacter={``}  className="amplify-button amplify-field-group__control">  Download as CSV</CSVLink>
+                    </Flex>
+                    <OrderedDictionaryArrayTable items={filteredProducts} columns={productColumns}/>
+                    </> )
+                }
+            </>
+        )
+
     }
 
     return (

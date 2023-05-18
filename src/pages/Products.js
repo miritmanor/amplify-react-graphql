@@ -7,6 +7,7 @@ import {fetchProducts,fetchProduct,modifyProduct} from "../lambdaAccess.js";
 import {OrderedDictionaryArrayTable} from "../OrderedDictionaryArrayTable.js";
 //import {fetchSuppliers} from "../lambdaAccess.js";
 import FileUploader from "./upload";
+import {isInSearchTerm} from "../search.js"
 
 //import { API } from "aws-amplify";
 import {
@@ -46,14 +47,8 @@ const Products = () => {
 
       const p = products.filter((item) => {
         //console.log(item);
-        for (var key in item) {
-          if (typeof item[key] === 'string') {
-            if (item[key].toLowerCase().includes(searchTerm.toLowerCase())) {
-              return true;
-            }
-          }
-        }
-        return false;
+        return (isInSearchTerm(item,searchTerm));
+
       });
       setFilteredProducts(p);
      }, 500);
