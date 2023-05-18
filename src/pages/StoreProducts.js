@@ -115,7 +115,7 @@ const StoreProducts = () => {
                     Show products 
                 </Button>
                 <Button   key="importproducts" name="import_products" onClick={importProducts} >
-                    Sync WordPress store to DB
+                    Sync new products and suppliers from store to main DB
                 </Button>            
             </Flex>
         )
@@ -161,7 +161,7 @@ const StoreProducts = () => {
         <View style={{ marginTop: '50px' }}>
             <h2>Select store to display products</h2>
             <InputForm/>
-            <Status status={status} />
+            <h4>  <Status status={status} /> </h4>
             <DisplayContent  />
         </View>
     );

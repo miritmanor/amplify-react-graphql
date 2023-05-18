@@ -10,7 +10,6 @@ import Layout from "./pages/Layout";
 import NoPage from "./pages/NoPage";
 import Products from "./pages/Products";
 import StoreProducts from "./pages/StoreProducts";
-import FileUploader from "./pages/upload";
 import CompareToStore from "./pages/compareToStore";
 import ApplyChanges from "./pages/applyChanges";
 import Suppliers from "./pages/suppliers";
@@ -24,7 +23,6 @@ const App = ({ signOut }) => {
           <Route index element={<Products />} />
           <Route path="products" element={<Products />} />
           <Route path="storeproducts" element={<StoreProducts />} />
-          <Route path="upload" element={<FileUploader />} />
           <Route path="compareToStore" element={<CompareToStore />} />
           <Route path="applyChanges" element={<ApplyChanges />} />
           <Route path="suppliers" element={<Suppliers />} />

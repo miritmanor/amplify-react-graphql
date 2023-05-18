@@ -1,10 +1,16 @@
 //import AWS from 'aws-sdk';
 import { Storage } from 'aws-amplify';
+import React, { useRef } from 'react';
 import { useState } from 'react';
 import {invokeLambdaDirectly} from "../lambdaAccess.js";
 import {Table} from "../mapToTable.js";
 import {Status} from "../status.js";
-
+import {
+  Flex,
+  Button,
+  Text,
+} from "@aws-amplify/ui-react";
+import "../App.css";
 
 export default function FileUploader() {
   //const s3 = new AWS.S3();
@@ -13,6 +19,12 @@ export default function FileUploader() {
   //const [fileContents, setFileContents] = useState(null);
   const [uploadResults, setUploadResults] = useState("");
   const [status,setStatus] = useState("");
+
+  const fileInputRef = useRef(null);
+
+  const handleButtonClick = () => {
+    fileInputRef.current.click();
+  };
 
   const handleFileSelect = (e) => {
     const selectedFile = e.target.files[0];
@@ -23,9 +35,13 @@ export default function FileUploader() {
       //setFileContents( reader.result);
       setUploadResults("");
     };
-    reader.readAsBinaryString(selectedFile);
-
-   }
+    try {
+      reader.readAsBinaryString(selectedFile);
+    }
+    catch(err) {
+      console.log("failed to read file");
+    }
+  }
    /*
   const uploadToS3 = async () => {
     if (!file) {
@@ -117,25 +133,23 @@ export default function FileUploader() {
 }
 
   return (
-    <div style={{ marginTop: '50px' }}>
-      <h2>Upload Excel/CSV file for updating product data</h2>
-      <input type="file" onChange={handleFileSelect} />
-      {file && (
-        <div style={{ marginTop: '10px' }}>
-          {/*<button onClick={uploadToS3}>Apply changes to products</button> */}
-          {/*<button onClick={applyChangesFromFile}>Apply changes to products</button> */}
-          <button onClick={applyChangesThroughS3}>Apply changes to products main table</button> 
-        </div>
-      )}
-      {/*
-      {fileUrl && (
-        <div style={{ marginTop: '10px' }}>
-          <img src={fileUrl} alt="uploaded" />
-        </div>
-      )}
-      */}
-      <Status status={status} />
+    <Flex   alignItems="top"    alignContent="flex-start"  paddingTop="5px" paddingBottom="20px" direction="column"> 
+      <Flex   alignItems="center"    alignContent="flex-start"  paddingTop="5px" paddingBottom="20px" direction="row"> 
+        <Text> File to import from: </Text>
+        <Button onClick={handleButtonClick}>
+          Choose File
+        </Button>
+        <Text className="file-name">{file && file['name']}</Text>
+        <input type="file" accept=".csv, .xls, .xlsx"  className="hidden-file-input" ref={fileInputRef} onChange={handleFileSelect}/>
+        {/* <input type="file" accept=".csv, .xls, .xlsx" onChange={handleFileSelect} /> */}
+        {file && (
+          <Flex >
+            <Button onClick={applyChangesThroughS3}>Apply changes</Button> 
+            <Status status={status} />
+          </Flex>
+        )}
+        </Flex>
       <DisplayContent/>
-    </div>
+    </Flex>
   );
 }

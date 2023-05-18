@@ -6,6 +6,7 @@ import {fetchProducts,fetchProduct,modifyProduct} from "../lambdaAccess.js";
 //import {MyTable,Table} from "../mapToTable.js";
 import {OrderedDictionaryArrayTable} from "../OrderedDictionaryArrayTable.js";
 //import {fetchSuppliers} from "../lambdaAccess.js";
+import FileUploader from "./upload";
 
 //import { API } from "aws-amplify";
 import {
@@ -165,6 +166,8 @@ const Products = () => {
   }
 
 
+
+
   /*
   function InputForm() {
 
@@ -246,6 +249,17 @@ const Products = () => {
     }
   }
 
+  const [showImportForm,setShowImportForm] = useState(false);
+  const [importButtonText,setImportButtonText] = useState("Import changes from CSV/Excel");
+  function showImportButton() {
+    if (showImportForm) {
+      setShowImportForm(false);
+      setImportButtonText("Import changes from CSV/Excel");
+    } else {
+      setShowImportForm(true);
+      setImportButtonText("Hide import form");
+    }
+  }
   const columns=["ProductSKU","name","supplier","status","unit","regular_price","sale_price","description","short_description"];
   const csvcolumns=["ProductSKU","name","supplier","status","unit","regular_price","sale_price"];
 
@@ -286,8 +300,10 @@ const Products = () => {
         <input type="text" placeholder="Search products" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
         <CSVLink data={filteredProducts} headers={csvcolumns} filename={"main-database-products"+searchTerm+".csv"} enclosingCharacter={``} className="amplify-button amplify-field-group__control">  Download as CSV</CSVLink>
         <Button key="showUpdateButton" name="show_update_button" onClick={showUpdateButton}>{updateButtonText}</Button>
+        <Button key="showImportButton" name="show_import_button" onClick={showImportButton}>{importButtonText}</Button>
       </Flex>
       {showUpdateForm && <UpdateSingleProduct /> }
+      {showImportForm && <FileUploader /> }
  
       <Heading level={5} paddingBottom="10px">Product list</Heading>
       

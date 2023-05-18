@@ -152,7 +152,7 @@ const CompareToStore = () => {
         <div style={{ marginTop: '50px' }}>
             <h2>Select store to display differences</h2>
             <InputForm/>
-            <Status status={status} />
+            <h4> <Status status={status} /></h4>
             <DisplayContent  />
         </div>
     );

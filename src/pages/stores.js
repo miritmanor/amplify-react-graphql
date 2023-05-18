@@ -18,7 +18,7 @@ const Stores = () => {
   // only on first render - fetch stores. when done it will set the stores array
   useEffect(() => {
     console.log("in useEffect - fetching");
-    fetchStores(setStores,"");
+    fetchStores(setStores,""); 
   }, []);
 
   useEffect(() => {

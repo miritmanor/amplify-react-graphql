@@ -275,7 +275,7 @@ const ApplyChanges = () => {
         <div style={{ marginTop: '50px' }}>
             <h2>Select stores to apply changes</h2>
             <InputForm/>
-            <Status status={status} />
+            <h4><Status status={status} /> </h4>
             <DisplayContent  />
         </div>
     );

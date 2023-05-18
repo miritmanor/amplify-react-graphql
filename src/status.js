@@ -7,8 +7,9 @@ export function Status({status}) {
     if (s === 'ready') {
         return ("");
     }
-    return ( 
-        <h4> {s} </h4>
+    return ( <>
+         {s} 
+        </>
     );
 }
 
