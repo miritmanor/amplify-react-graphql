@@ -5,7 +5,6 @@ import {fetchStores} from "../lambdaAccess.js";
 import {OrderedDictionaryArrayTable} from "../OrderedDictionaryArrayTable.js";
 
 import {
-  Heading,
   View,
 } from "@aws-amplify/ui-react";
 
@@ -52,8 +51,8 @@ const Stores = () => {
   const columns=["StoreName","LastSync","LastUpdated","URL","APIKey","WP_application_password_name"];
 
   return (
-    <View className="App">
-      <Heading paddingTop="5px" paddingBottom="20px" level={4}>Commiz stores - database list </Heading>
+    <View style={{ marginTop: '50px' }}>
+      <h2>Commiz stores - database list </h2>
       <OrderedDictionaryArrayTable items={formattedStores} columns={columns}/>
 
     </View>

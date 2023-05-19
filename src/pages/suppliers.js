@@ -6,7 +6,6 @@ import {OrderedDictionaryArrayTable} from "../OrderedDictionaryArrayTable.js";
 
 import {
   Flex,
-  Heading,
   View,
 } from "@aws-amplify/ui-react";
 
@@ -50,8 +49,8 @@ const Suppliers = () => {
 
 
   return (
-    <View className="App">
-      <Heading paddingTop="5px" paddingBottom="20px" level={4}>Commiz suppliers in main DB </Heading>
+    <View style={{ marginTop: '50px' }}>
+      <h2>Commiz suppliers in main DB </h2>
       <Flex   alignItems="center"    alignContent="flex-start" >
         <input type="text" placeholder="Search suppliers" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
       </Flex>

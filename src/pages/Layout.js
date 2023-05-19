@@ -10,10 +10,7 @@ const Layout = () => {
             <Link to="/products">Main database</Link>
           </li>
           <li>
-            <Link to="/storeproducts">Stores</Link>
-          </li>
-          <li>
-            <Link to="/compareToStore">View differences</Link>
+            <Link to="/storeproducts">Store products</Link>
           </li>
           <li>
             <Link to="/applyChanges">Apply changes to stores</Link>

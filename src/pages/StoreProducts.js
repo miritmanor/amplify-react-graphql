@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import {fetchStores,invokeLambdaDirectly,checkServerResponse} from "../lambdaAccess.js";
+import {fetchStores,fetchSuppliers,invokeLambdaDirectly,checkServerResponse} from "../lambdaAccess.js";
 import {OrderedDictionaryArrayTable} from "../OrderedDictionaryArrayTable.js";
 import { CSVLink } from "react-csv";
 import {
@@ -20,10 +20,14 @@ const StoreProducts = () => {
     const [filteredProducts,setFilteredProducts] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [results,setResults] = useState([]);
+
     const [showResults,setShowResults] = useState(null);
+    const [changes,setChanges] = useState([]);
+    const [showChanges,setShowChanges] = useState(null);
     const [inputs, setInputs] = useState({});
     const [status,setStatus] = useState("");
     const [stores,setStores] = useState([]);
+    const [suppliers,setSuppliers] = useState([]);
 
     //var outputType='Products';
 
@@ -31,6 +35,7 @@ const StoreProducts = () => {
         //Runs only on the first render
         console.log("fetching stores");
         fetchStores(setStores);
+        fetchSuppliers(setSuppliers,""); // fetch all suppliers, not filtered by store, as there is no store selection yet
      }, []);
 
        // when products changes, initiate filteredProducts to the same array
@@ -53,11 +58,64 @@ const StoreProducts = () => {
         return () => clearTimeout(timeOutId);
     }, [searchTerm,products]);
 
+    const showStoreDifferences = () => {
+        console.log("in showStoreDifferences");
+        //setInputs(values => ({...values,  showStoreDifferences: true }));
+        console.log("inputs:",inputs);
+        setStatus("Working... waiting for results");
+        setProducts([]);
+        setShowProducts(false);
+        setResults([]);
+        setShowResults(false);
+        setChanges([]);
+        setShowChanges(false);
+        if (!Object.hasOwn(inputs, 'storename') || !inputs.storename) {
+            console.log("missing store name");
+            setStatus("Store name missing");
+            //setChanges([]);
+        } else {
+            const storename=inputs.storename;
+            const queryStringParameters={
+                supplier: inputs.supplier
+            }
+            console.log(queryStringParameters);
+            invokeLambdaDirectly('GET','/changes/{storename+}','/changes/'+storename,{'storename':storename},queryStringParameters,"").then(res => {
+                try{
+                    console.log(res);
+                    const payload= JSON.parse(res.Payload);
+                    const body=JSON.parse(payload.body);
+                    const message=checkServerResponse(res);
+                    if (message !== "") {
+                        console.log("Error: ",message);
+                        setStatus(message);
+                    }
+                    else {
+                        if (body.length === 0) {//empty
+                            setStatus("Completed comparing store and central database, no differences found");
+                        } else {
+                            setStatus("Completed comparing store and central database");
+                            setShowChanges(true);
+                        }
+                    
+                        //type="differences";
+                        setChanges(body);
+                        
+                    }                   
+                }
+                catch (err) {
+                    console.log(err);
+                    setStatus("Failed to get changes");
+                }
+            });
+
+        }
+    }
+
     function InputForm() {
 
         console.log("in inputform");
-        const handleChange = (event) => {
-            console.log("in handleChange");
+        const handleStoreChange = (event) => {
+            console.log("in handleStoreChange");
             console.log(event.target.name, event.target.value);
             const name = event.target.name;
             const value = event.target.value;
@@ -66,6 +124,18 @@ const StoreProducts = () => {
             setShowProducts(false)
             setResults([]);
             setShowResults(false);
+            setChanges([]);
+            setShowChanges(false);
+            setSuppliers([]);
+            fetchSuppliers(setSuppliers,event.target.value);
+        }
+
+        const handleSupplierChange = (event) => {
+            const name = event.target.name;
+            const value = event.target.value;
+            setInputs(values => ({...values, [name]: value}))
+            setStatus("");
+            setChanges([]);
         }
  
         const showProducts = () => {
@@ -76,11 +146,15 @@ const StoreProducts = () => {
                 setStatus("Store name missing");
                 setProducts([]);
                 setShowProducts(false);
+                setChanges([]);
+                setShowChanges(false);
             } else {
                 setProducts([]);
                 setShowProducts(false);
                 setResults([]);
                 setShowResults(false);
+                setChanges([]);
+                setShowChanges(false);
                 setStatus("Waiting for results");
                 invokeLambdaDirectly('GET','/products/{storename+}','/products/'+inputs.storename,{'storename':inputs.storename},{},"").then(res => {
                     console.log(res);
@@ -109,11 +183,15 @@ const StoreProducts = () => {
                 setStatus("Store name missing");
                 setProducts([]);
                 setShowProducts(false);
+                setChanges([]);
+                setShowChanges(false);
             } else {
                 setProducts([]);
                 setShowProducts(false);
                 setResults([]);
                 setShowResults(false);
+                setChanges([]);
+                setShowChanges(false);
                 setStatus("Waiting for results");
                 invokeLambdaDirectly('POST','/products/import','/products/import',{},{'store':inputs.storename},"").then(res => {
                     console.log(res);
@@ -135,8 +213,8 @@ const StoreProducts = () => {
         }
 
         return (
-            <Flex   alignItems="center"    alignContent="flex-start" >
-                <SelectField  key="storename" name="storename" placeholder="Select store" value={inputs.storename || ""}  onChange={handleChange}>
+            <Flex   alignItems="center"    alignContent="flex-start"  >
+                <SelectField  key="storename" name="storename"  placeholder="Select store" value={inputs.storename || ""}  onChange={handleStoreChange}>
                         {stores.map((store) => (
                             <option value={store.StoreName}>
                                 {store.StoreName}
@@ -149,7 +227,18 @@ const StoreProducts = () => {
                 </Button>
                 <Button   key="importproducts" name="import_products" onClick={importProducts} >
                     Sync new products and suppliers from store to main DB
-                </Button>            
+                </Button>  
+                <SelectField  key="supplier" name="supplier" placeholder="All suppliers" value={inputs.supplier || ""}  onChange={handleSupplierChange}>
+                        {suppliers.map((supplier) => (
+                            <option value={supplier}>
+                                {supplier}
+                            </option>
+                        ))}
+
+                </SelectField>
+                <Button key="showdiffs" name="show_differences" onClick={showStoreDifferences} >
+                    Show differences 
+                </Button>          
             </Flex>
         )
     }
@@ -157,6 +246,7 @@ const StoreProducts = () => {
     function DisplayContent() {
         const productColumns=["ProductSKU","name","supplier","status","unit","regular_price","sale_price","id_in_store","category_id_in_store","supplier_id_in_store"];
         const resultColumns=["sku","result"];
+        const changeColumns=["SKU","Name","Supplier","Details"];
 
         return(
             <>
@@ -178,6 +268,17 @@ const StoreProducts = () => {
                     <OrderedDictionaryArrayTable items={filteredProducts} columns={productColumns}/>
                     </> )
                 }
+                {showChanges &&
+                (
+                    <>
+                    <h2>Differences between store and main database </h2>
+                    <Flex   alignItems="center"    alignContent="flex-start" paddingTop="10px" paddingBottom="10px">
+                        <CSVLink data={changes} headers={changeColumns} filename={inputs.storename+"-changes.csv"} className="amplify-button amplify-field-group__control">  Download as CSV</CSVLink>
+                    </Flex>
+                    <OrderedDictionaryArrayTable items={changes} columns={changeColumns}/>
+                </>
+                )
+                }
             </>
         )
 
@@ -185,7 +286,7 @@ const StoreProducts = () => {
 
     return (
         <View style={{ marginTop: '50px' }}>
-            <h2>Select store to display products</h2>
+            <h2>View and compare store products</h2>
             <InputForm/>
             <h4>  <Status status={status} /> </h4>
             <DisplayContent  />

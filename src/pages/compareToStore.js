@@ -137,7 +137,6 @@ const CompareToStore = () => {
                         <CSVLink data={changes} headers={columns} filename={inputs.storename+"-changes.csv"} className="amplify-button amplify-field-group__control">  Download as CSV</CSVLink>
                     </Flex>
                     <OrderedDictionaryArrayTable items={changes} columns={columns}/>
-                    {/*<Table rowList={changes} rowkey='sku' /> */}
                 </>
             )
         } else {

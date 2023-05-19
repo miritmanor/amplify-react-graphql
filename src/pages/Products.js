@@ -261,8 +261,8 @@ const Products = () => {
 
 
   return (
-    <View className="App">
-      <Heading level={1}>Commiz main database</Heading>
+    <View  style={{ marginTop: '50px' }}>
+      <h2>Commiz main database</h2>
 
       {/*<InputForm/>*/}
       {/*
