@@ -1,15 +1,20 @@
 import { Auth } from 'aws-amplify';
 import AWS from 'aws-sdk';
 
-const LAMBDA_NAME='commiz-admin';
-const REGION='us-east-1';
-const BASEURL="https://p2qa0zr9n5.execute-api.us-east-1.amazonaws.com/dev/";  // API gateway URL
+const LAMBDA_NAME=process.env.REACT_APP_LAMBDA_FUNCTION;
+const REGION=process.env.REACT_APP_REGION;
+const BASEURL=process.env.REACT_APP_API_GATEWAY_URL;  // API gateway URL
+const IDENTITY_POOL_ID=process.env.REACT_APP_IDENTITY_POOL_ID;
+const COGNITO_IDP=process.env.REACT_APP_COGNITO_IDP;
+
   export  function getBaseURL() {
       console.log("in getBaseURL");
       return (BASEURL);
   }
 
   export async function fetchProducts(setProducts) {
+    console.log(BASEURL);
+    console.log(REGION);
     var commizurl = BASEURL + 'products';
     /*
     if (supplier != "") {
@@ -149,9 +154,9 @@ export async function invokeLambdaDirectly(httpMethod,resource,path,pathParamete
     //var credentials = await Auth.currentCredentials();
     //console.log('AWS.config: ',AWS.config);
     const credentials = new AWS.CognitoIdentityCredentials({
-        IdentityPoolId: "us-east-1:5cd31dc5-c24d-47b3-bce4-d391c8c7c328",
+        IdentityPoolId: IDENTITY_POOL_ID,
         Logins: {
-          [`cognito-idp.us-east-1.amazonaws.com/us-east-1_UgXyFOAqT`]: idToken.jwtToken,
+          [COGNITO_IDP]: idToken.jwtToken,
         },
         region: REGION,
       });
