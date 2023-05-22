@@ -152,7 +152,8 @@ export async function invokeLambdaDirectly(httpMethod,resource,path,pathParamete
     // eslint-disable-next-line
     const { accessToken, idToken } = user.signInUserSession;
     //var credentials = await Auth.currentCredentials();
-    //console.log('AWS.config: ',AWS.config);
+    console.log('AWS.config: ',AWS.config);
+    console.log("idToken:",idToken);
     const credentials = new AWS.CognitoIdentityCredentials({
         IdentityPoolId: IDENTITY_POOL_ID,
         Logins: {
