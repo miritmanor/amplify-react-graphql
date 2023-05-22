@@ -239,7 +239,7 @@ export async function invokeLambdaDirectly(httpMethod,resource,path,pathParamete
         displayMessage = error;
     } finally {
       console.log("displayMessage:",displayMessage);
-      console.log("as a string:",displayMessage.toString());
+      //console.log("as a string:",displayMessage.toString());
       return displayMessage.toString();
     }
   }
