@@ -148,6 +148,9 @@ const COGNITO_IDP=process.env.REACT_APP_COGNITO_IDP;
 export async function invokeLambdaDirectly(httpMethod,resource,path,pathParameters,queryStringParameters,body) {
 
     AWS.config.update({region:REGION});
+    console.log("LAMBDA_NAME:",LAMBDA_NAME);
+    console.log("IDENTITY_POOL_ID:",IDENTITY_POOL_ID);
+    console.log("COGNITO_IDP:",COGNITO_IDP);
     const user = await Auth.currentAuthenticatedUser();
     // eslint-disable-next-line
     const { accessToken, idToken } = user.signInUserSession;
@@ -183,6 +186,7 @@ export async function invokeLambdaDirectly(httpMethod,resource,path,pathParamete
             'body': body
       }),
     };
+    console.log(params);
     
     try {
         console.log("invoking lambda now");
