@@ -192,7 +192,7 @@ export async function invokeLambdaDirectly(httpMethod,resource,path,pathParamete
   export function checkServerResponse(res) {
     console.log(res);
     
-    var displayMessage="";
+    var displayMessage=""; 
     try {
       switch (typeof res) {
         case 'object':
@@ -209,7 +209,7 @@ export async function invokeLambdaDirectly(httpMethod,resource,path,pathParamete
                   // eslint-disable-next-line
                   const body=JSON.parse(payload.body);
                   console.log("suucessfully parsed body")
-                  displayMessage="";  // empty message is a sign for success
+                  displayMessage="";  // empty message is a sign of success
                 } catch (err) {
                   console.log("failed to parse body");
                   console.log("returning payload ",payload)
