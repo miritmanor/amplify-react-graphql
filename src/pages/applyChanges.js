@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {invokeLambdaDirectly,checkServerResponse} from "../lambdaAccess.js";
 import {fetchStores,fetchSuppliers} from "../lambdaAccess.js";
-import {Table} from "../mapToTable.js";
+import {OrderedDictionaryArrayTable} from "../OrderedDictionaryArrayTable.js";
 import {Status} from "../status.js";
 //import Multiselect from "@cloudscape-design/components/multiselect";
 import {
@@ -257,10 +257,11 @@ const ApplyChanges = () => {
     function DisplayContent() {
 
         if (changes.length !== 0) {
+            const columns=['SKU', 'Result', 'Store'];
             return (
                 <>
                     <Heading level={4}>Results</Heading>
-                    <Table rowList={changes} rowkey='sku' />
+                    <OrderedDictionaryArrayTable items={changes} columns={columns}/>
                 </>
             )
         } else {
