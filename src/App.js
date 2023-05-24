@@ -17,6 +17,7 @@ import Stores from "./pages/stores";
 const App = ({ signOut }) => {
   return (
     <BrowserRouter>
+      <div><h4>Commiz {process.env.REACT_APP_ENV} environment</h4> </div>
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Products />} />

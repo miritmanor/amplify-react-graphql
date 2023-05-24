@@ -32,6 +32,9 @@ const Suppliers = () => {
   useEffect(() => {
     console.log("in useEffect - search");
     const timeOutId = setTimeout(() => {
+      if (!suppliers) {
+        return false;
+      }
       const p = suppliers.filter((item) => {
         for (var key in item) {
           if (item[key].toLowerCase().includes(searchTerm.toLowerCase()))

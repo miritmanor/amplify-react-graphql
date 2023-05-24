@@ -215,7 +215,7 @@ const StoreProducts = () => {
         return (
             <Flex   alignItems="center"    alignContent="flex-start"  >
                 <SelectField  key="storename" name="storename"  placeholder="Select store" value={inputs.storename || ""}  onChange={handleStoreChange}>
-                        {stores.map((store) => (
+                        {stores && stores.map((store) => (
                             <option value={store.StoreName}>
                                 {store.StoreName}
                             </option>
@@ -229,7 +229,7 @@ const StoreProducts = () => {
                     Sync new products and suppliers from store to main DB
                 </Button>  
                 <SelectField  key="supplier" name="supplier" placeholder="All suppliers" value={inputs.supplier || ""}  onChange={handleSupplierChange}>
-                        {suppliers.map((supplier) => (
+                        {suppliers && suppliers.map((supplier) => (
                             <option value={supplier}>
                                 {supplier}
                             </option>

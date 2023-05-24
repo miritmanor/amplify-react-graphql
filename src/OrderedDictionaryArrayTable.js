@@ -21,6 +21,9 @@ export function OrderedDictionaryArrayTable(props) {
 */
 
   console.log("order:",columnOrder);
+  if (!dictionaries) {
+    return <> Nothing to display</>
+  }
   const rows = dictionaries.map((dictionary, index) => {
     const cells = columnOrder.map((key) => {
       return <td key={key}>{dictionary[key]}</td>;

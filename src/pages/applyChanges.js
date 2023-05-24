@@ -210,7 +210,7 @@ const ApplyChanges = () => {
             */}
                 <Text paddingTop="20px">Select stores</Text>
                 <View paddingLeft="20px" paddingTop="10px" paddingRight="30px">
-                    {stores.map((store) => (
+                    {stores && stores.map((store) => (
                         <CheckboxField value={store.StoreName} name={store.StoreName} label={store.StoreName} checked={selectedStores.includes(store.StoreName)} onChange={handleStoreSelectionChange}/>
                     ))} 
                 </View>
@@ -240,7 +240,7 @@ const ApplyChanges = () => {
         return (
             <Flex   alignItems="center"    alignContent="flex-start" >
                 <SelectField  key="supplier" name="supplier" placeholder="All suppliers" value={inputs.supplier || ""}  onChange={handleSupplierChange}>
-                        {suppliers.map((supplier) => (
+                        {suppliers && suppliers.map((supplier) => (
                             <option value={supplier}>
                                 {supplier}
                             </option>
