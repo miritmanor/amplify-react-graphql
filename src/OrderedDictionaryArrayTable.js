@@ -20,7 +20,7 @@ export function OrderedDictionaryArrayTable(props) {
   console.log(headerkeys);
 */
 
-  console.log("order:",columnOrder);
+  //console.log("order:",columnOrder);
   if (!dictionaries) {
     return <> Nothing to display</>
   }
