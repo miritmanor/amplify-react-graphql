@@ -257,7 +257,7 @@ const ApplyChanges = () => {
     function DisplayContent() {
 
         if (changes.length !== 0) {
-            const columns=['SKU', 'Name', 'Supplier', 'Result', 'Store'];
+            const columns=['SKU', 'Name', 'Supplier', 'Result', 'Store', 'Details'];
             return (
                 <>
                     <Heading level={4}>Results</Heading>
