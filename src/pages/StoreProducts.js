@@ -8,6 +8,7 @@ import {
   SelectField,
   Flex,
   View,
+  Heading,
 } from "@aws-amplify/ui-react";
 import {Status} from "../status.js";
 import {isInSearchTerm} from "../search.js"
@@ -128,6 +129,8 @@ const StoreProducts = () => {
             setShowChanges(false);
             setSuppliers([]);
             fetchSuppliers(setSuppliers,event.target.value);
+            setInputs(values => ({...values, supplier: ""}));
+            //console.log(inputs.supplier);
         }
 
         const handleSupplierChange = (event) => {
@@ -170,9 +173,13 @@ const StoreProducts = () => {
                     else {
                         const payload= JSON.parse(res.Payload);
                         const body=JSON.parse(payload.body);
-                        setProducts(body);
-                        setShowProducts(true);
-                        setStatus("ready");
+                        if (body.length === 0) {//empty
+                            setStatus("No products found");
+                        } else {
+                            setProducts(body);
+                            setShowProducts(true);
+                            setStatus("ready");
+                        }
                     }
                 }
                 );
@@ -256,7 +263,7 @@ const StoreProducts = () => {
             <>
                 {showResults && 
                 (<> 
-                <h2>Results for products import from store</h2>
+                <Heading level={5} >Results for products import from store</Heading>
                 <Flex   alignItems="center"    alignContent="flex-start" paddingTop="10px" paddingBottom="10px">
                     <CSVLink data={results} headers={resultColumns} filename={inputs.storename+"-import-results.csv"} className="amplify-button amplify-field-group__control">  Download results as CSV</CSVLink>
                 </Flex>
@@ -264,7 +271,7 @@ const StoreProducts = () => {
                 </>)}
                 {showProducts &&
                 ( <>
-                    <h2>List of products currently in store</h2>
+                    <Heading level={5} >Products in store</Heading>
                     <Flex   alignItems="center"    alignContent="flex-start" paddingTop="10px" paddingBottom="10px">
                         <input type="text" placeholder="Search products" autoFocus value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                         <CSVLink data={filteredProducts} headers={productColumns} filename={inputs.storename+"-products.csv"} enclosingCharacter={``}  className="amplify-button amplify-field-group__control">  Download as CSV</CSVLink>
@@ -275,7 +282,7 @@ const StoreProducts = () => {
                 {showChanges &&
                 (
                     <>
-                    <h2>Differences between store and main database </h2>
+                    <Heading level={5} >Differences between store and main database</Heading>
                     <Flex   alignItems="center"    alignContent="flex-start" paddingTop="10px" paddingBottom="10px">
                         <CSVLink data={changes} headers={changeColumns} filename={inputs.storename+"-changes.csv"} className="amplify-button amplify-field-group__control">  Download as CSV</CSVLink>
                     </Flex>
