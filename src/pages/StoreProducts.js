@@ -156,7 +156,11 @@ const StoreProducts = () => {
                 setChanges([]);
                 setShowChanges(false);
                 setStatus("Waiting for results");
-                invokeLambdaDirectly('GET','/products/{storename+}','/products/'+inputs.storename,{'storename':inputs.storename},{},"").then(res => {
+                const queryStringParameters={
+                    supplier: inputs.supplier
+                }
+                console.log(queryStringParameters);
+                invokeLambdaDirectly('GET','/products/{storename+}','/products/'+inputs.storename,{'storename':inputs.storename},queryStringParameters,"").then(res => {
                     console.log(res);
                     const message=checkServerResponse(res);
                     if (message !== "") {
@@ -222,12 +226,6 @@ const StoreProducts = () => {
                         ))}
 
                 </SelectField>
-                <Button   key="showproducts" name="show_products" onClick={showProducts} >
-                    Show products 
-                </Button>
-                <Button   key="importproducts" name="import_products" onClick={importProducts} >
-                    Sync new products and suppliers from store to main DB
-                </Button>  
                 <SelectField  key="supplier" name="supplier" placeholder="All suppliers" value={inputs.supplier || ""}  onChange={handleSupplierChange}>
                         {suppliers && suppliers.map((supplier) => (
                             <option value={supplier}>
@@ -236,8 +234,14 @@ const StoreProducts = () => {
                         ))}
 
                 </SelectField>
+                <Button   key="showproducts" name="show_products" onClick={showProducts} >
+                    Show products 
+                </Button>
                 <Button key="showdiffs" name="show_differences" onClick={showStoreDifferences} >
                     Show differences 
+                </Button>  
+                <Button   key="importproducts" name="import_products" onClick={importProducts} >
+                    Sync new products and suppliers from store to main DB
                 </Button>          
             </Flex>
         )
