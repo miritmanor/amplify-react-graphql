@@ -4,23 +4,24 @@ export function OrderedDictionaryArrayTable(props) {
   const dictionaries = props.items;
   const columnOrder = props.columns;
 
+  // perform action upon selecting a row in the table
+  const handleRowClick = (event) => { 
+    const row = event.target.parentNode;
+    console.log("row:",row)
+    // get a function from props that will handle the click
+    const action = props.action;
+    if (action) {
+      action(row);
+    }
+    //const sku = row.cells[0].innerText;
+    //const change = {SKU:sku,Name:name,Supplier:supplier,Details:details,Store:store,Result:result};
+  }
+
+
   if (dictionaries && dictionaries.length ===0) {
     return <> </>
   }
 
-  /*
-  var headercolumns = [];
-  const headerkeys = [];
-  Object.keys(dictionaries[0]).forEach((key, index) => {
-      headercolumns.push(
-          <th> {key} </th>
-      );
-      headerkeys.push(key);
-  });
-  console.log(headerkeys);
-*/
-
-  //console.log("order:",columnOrder);
   if (!dictionaries) {
     return <> Nothing to display</>
   }
@@ -29,8 +30,13 @@ export function OrderedDictionaryArrayTable(props) {
       return <td key={key}>{dictionary[key]}</td>;
     });
 
-    return <tr key={index}>{cells}</tr>;
+    return <tr key={index} onClick={handleRowClick}>{cells}</tr>;
   });
+
+  // insert code in each row to handle click
+  //rows.forEach((row) => { 
+    //row.onclick = handleRowClick;
+  //});
 
   return (
     <table>
