@@ -248,7 +248,7 @@ const StoreProducts = () => {
                     Show differences 
                 </Button>  
                 <Button   key="importproducts" name="import_products" onClick={importProducts} >
-                    Sync new products and suppliers from store to main DB
+                    Sync new/removed products. new suppliers from store to DB
                 </Button>          
             </Flex>
         )

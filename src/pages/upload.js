@@ -88,7 +88,9 @@ export default function FileUploader(props) {
     try {
       console.log(file);
       setStatus("Uploading file");
-      await Storage.put(file.name, file, {
+      // set up a unique file name with  a timestamp
+      const tempfilename=Date.now() + '-' +  file.name;
+      await Storage.put(tempfilename, file, {
         //contentType: "image/png", // contentType is optional
       });
       setStatus("Importing to database");
@@ -96,7 +98,7 @@ export default function FileUploader(props) {
         "/products/import_changes_from_file",
         "/products/import_changes_from_file",
         "",
-        {"filename": file.name},
+        {"filename": tempfilename},
         "") ;
       //console.log("received results -",results["StatusCode"]);
       const payload=JSON.parse(results["Payload"]);
