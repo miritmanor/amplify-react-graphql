@@ -9,10 +9,12 @@ import {
   Flex,
   Button,
   Text,
+  Heading,
 } from "@aws-amplify/ui-react";
 import "../App.css";
 
-export default function FileUploader() {
+export default function FileUploader(props) {
+  const refresh = props.refresh;
   //const s3 = new AWS.S3();
   //const [fileUrl, setfileUrl] = useState(null);
   const [file, setFile] = useState(null);
@@ -30,6 +32,7 @@ export default function FileUploader() {
     const selectedFile = e.target.files[0];
     console.log("selected file: ",selectedFile);
     setFile(selectedFile);
+    /*
     const reader = new FileReader();
     reader.onload = () => {
       //setFileContents( reader.result);
@@ -41,6 +44,7 @@ export default function FileUploader() {
     catch(err) {
       console.log("failed to read file");
     }
+    */
   }
    /*
   const uploadToS3 = async () => {
@@ -60,9 +64,27 @@ export default function FileUploader() {
   */
 
   const applyChangesThroughS3 = async () => {
+    console.log("in applyChangesThroughS3"  );
     if (!file) {
       return;
     }
+
+    console.log("file:",file);
+    // load file contents
+    const reader = new FileReader();
+    reader.onload = () => {
+      //setFileContents( reader.result);
+      setUploadResults("");
+    };
+    try {
+      console.log("reading file");
+      reader.readAsBinaryString(file);
+    }
+    catch(err) {
+      console.log("failed to read file");
+    }
+
+    // import changes
     try {
       console.log(file);
       setStatus("Uploading file");
@@ -82,9 +104,12 @@ export default function FileUploader() {
       console.log("Received results: ",JSON.parse(o.body));
       setStatus("ready");
       setUploadResults(JSON.parse(o.body));
+      refresh();
     
     } catch (error) {
       console.log("Error uploading file: ", error);
+      setStatus("Error uploading file: "+error);
+      setUploadResults("");
     }
 
   }
@@ -118,10 +143,11 @@ export default function FileUploader() {
 
   function DisplayContent() {
 
+
     if (uploadResults.length !== 0) {
         return (
           <div> 
-          <h2> Results of changes to products </h2>
+          <Heading level={5} paddingBottom="5px">Results of changes to products</Heading>
            <Table rowList={uploadResults} rowkey='sku' />
            </div>
         )

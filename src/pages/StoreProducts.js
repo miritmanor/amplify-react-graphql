@@ -296,7 +296,7 @@ const StoreProducts = () => {
     }
 
     return (
-        <View style={{ marginTop: '50px' }}>
+        <View style={{ marginTop: '30px' }}>
             <h2>View and compare store products</h2>
             <InputForm/>
             <h4>  <Status status={status} /> </h4>

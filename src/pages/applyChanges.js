@@ -273,7 +273,7 @@ const ApplyChanges = () => {
 
     console.log("changes:",changes);
     return (
-        <div style={{ marginTop: '50px' }}>
+        <div style={{ marginTop: '30px' }}>
             <h2>Select stores to apply changes</h2>
             <InputForm/>
             <h4><Status status={status} /> </h4>

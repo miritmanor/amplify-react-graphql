@@ -53,7 +53,8 @@ const Products = () => {
       setFilteredProducts(p);
      }, 500);
     return () => clearTimeout(timeOutId);
-  }, [searchTerm,products]);
+  //}, [searchTerm,products]);
+  }, [searchTerm]);
   
   const [productSKU, setProductSKU] = useState("");
   const [inputs, setInputs] = useState({});
@@ -70,6 +71,10 @@ const Products = () => {
     setInputs(values => ({...values, [name]: value}))
     //setUpdate(1);
     setResults("");
+  }
+
+  function refreshProducts() {
+    fetchProducts(setProducts);
   }
 
   function getProduct() {
@@ -219,7 +224,7 @@ const Products = () => {
 
 
   return (
-    <View  style={{ marginTop: '50px' }}>
+    <View  style={{ marginTop: '30px' }}>
       <h2>Commiz main database</h2>
 
       {/*<InputForm/>*/}
@@ -269,7 +274,7 @@ const Products = () => {
             </Flex>
       )
        }
-      {showImportForm && <FileUploader /> }
+      {showImportForm && <FileUploader refresh={refreshProducts} /> }
  
       <Heading level={5} paddingBottom="10px">Product list</Heading>
       
