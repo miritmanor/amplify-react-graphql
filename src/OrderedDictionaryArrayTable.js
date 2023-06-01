@@ -1,12 +1,14 @@
-import React from 'react';
+import React,{ useState } from 'react';
 
 export function OrderedDictionaryArrayTable(props) {
+  const [selectedLine, setSelectedLine] = useState(null);
   const dictionaries = props.items;
   const columnOrder = props.columns;
 
   // perform action upon selecting a row in the table
   const handleRowClick = (event) => { 
     const row = event.target.parentNode;
+    setSelectedLine(event);
     console.log("row:",row)
     // get a function from props that will handle the click
     const action = props.action;
