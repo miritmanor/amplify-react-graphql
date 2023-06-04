@@ -2,7 +2,7 @@
 import { Storage } from 'aws-amplify';
 import React, { useRef } from 'react';
 import { useState } from 'react';
-import {invokeLambdaDirectly} from "../lambdaAccess.js";
+import {invokeLambdaDirectly,checkServerResponse} from "../lambdaAccess.js";
 import {Table} from "../mapToTable.js";
 import {Status} from "../status.js";
 import {
@@ -100,20 +100,37 @@ export default function FileUploader(props) {
         "",
         {"filename": tempfilename},
         "") ;
-      //console.log("received results -",results["StatusCode"]);
-      const payload=JSON.parse(results["Payload"]);
-      const o=JSON.parse(payload.body);
-      console.log("Received results: ",JSON.parse(o.body));
-      setStatus("ready");
-      setUploadResults(JSON.parse(o.body));
-      refresh();
-    
+
+        const message=checkServerResponse(results);
+        console.log("Checked server response, message: ",message)
+        if (message !== "") {
+            console.log("Error: ",message);
+            setStatus(message);
+        } else {
+            const payload=JSON.parse(results["Payload"]);
+
+            if (payload.body.length === 0) {//empty
+                setStatus("Failed to upload file, empty response");
+            } else {
+              //console.log("received results -",results["StatusCode"]);
+              const o=JSON.parse(payload.body);
+              const body=JSON.parse(o.body);
+              console.log("Received results: ",body);
+              if (typeof body === 'string' || body instanceof String) {
+                setStatus("Failed to upload file: "+body);
+                setUploadResults("");
+              } else {
+                setStatus("ready");
+                setUploadResults(JSON.parse(o.body));
+              }
+              refresh();
+            } 
+        } 
     } catch (error) {
       console.log("Error uploading file: ", error);
       setStatus("Error uploading file: "+error);
       setUploadResults("");
     }
-
   }
   /* 
   const applyChangesFromFile = async () => {

@@ -54,6 +54,7 @@ const Products = () => {
      }, 500);
     return () => clearTimeout(timeOutId);
   //}, [searchTerm,products]);
+  // eslint-disable-next-line 
   }, [searchTerm]);
   
   const [productSKU, setProductSKU] = useState("");
