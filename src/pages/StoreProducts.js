@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import {fetchStores,fetchSuppliers,invokeLambdaDirectly,checkServerResponse} from "../lambdaAccess.js";
+import {fetchStores,fetchSuppliers,syncStoreToMainDB,invokeLambdaDirectly,checkServerResponse} from "../lambdaAccess.js";
 import {OrderedDictionaryArrayTable} from "../OrderedDictionaryArrayTable.js";
 import { CSVLink } from "react-csv";
 import {
@@ -23,6 +23,7 @@ const StoreProducts = () => {
     const [results,setResults] = useState([]);
 
     const [showResults,setShowResults] = useState(null);
+    const [showSyncFromStoreREsults,setShowSyncFromStoreResults] = useState(null);
     const [changes,setChanges] = useState([]);
     const [showChanges,setShowChanges] = useState(null);
     const [inputs, setInputs] = useState({});
@@ -74,7 +75,7 @@ const StoreProducts = () => {
             console.log("missing store name");
             setStatus("Store name missing");
             //setChanges([]);
-        } else {
+        } else { 
             const storename=inputs.storename;
             const queryStringParameters={
                 supplier: inputs.supplier
@@ -156,6 +157,7 @@ const StoreProducts = () => {
                 setShowProducts(false);
                 setResults([]);
                 setShowResults(false);
+                setShowSyncFromStoreResults(false);
                 setChanges([]);
                 setShowChanges(false);
                 setStatus("Waiting for results");
@@ -201,6 +203,7 @@ const StoreProducts = () => {
                 setShowProducts(false);
                 setResults([]);
                 setShowResults(false);
+                setShowSyncFromStoreResults(false);
                 setChanges([]);
                 setShowChanges(false);
                 setStatus("Waiting for results");
@@ -221,6 +224,39 @@ const StoreProducts = () => {
                     }
                 } );
             }
+        }
+
+        const syncStoreToDB = () => {
+            console.log("in syncStoreToDB");
+            console.log("inputs:",inputs);
+            if (!Object.hasOwn(inputs, 'storename') || !inputs.storename) {
+                console.log("missing store name");
+                setStatus("Store name missing");
+                setProducts([]);
+                setShowProducts(false);
+                setChanges([]);
+                setShowChanges(false);
+            } else {
+                setProducts([]);
+                setShowProducts(false);
+                setResults([]);
+                setShowResults(false);
+                setShowSyncFromStoreResults(false);
+                setChanges([]);
+                setShowChanges(false);
+                setStatus("Waiting for results");
+                syncStoreToMainDB(inputs.storename,inputs.supplier).then(res => {
+                    console.log(res);
+                    if (res.length === 0) {
+                        setStatus("No changes applied");
+                    } else{
+                        setResults(res);
+                        setShowSyncFromStoreResults(true);
+                        setStatus("ready");
+                    }
+                } );
+            }
+            
         }
 
         return (
@@ -248,8 +284,11 @@ const StoreProducts = () => {
                     Show differences 
                 </Button>  
                 <Button   key="importproducts" name="import_products" onClick={importProducts} >
-                    Sync new/removed products. new suppliers from store to DB
-                </Button>          
+                    Sync new/removed products to DB
+                </Button>     
+                <Button   key="syncStoreToDB" name="syncStoreToDB" onClick={syncStoreToDB} >
+                    Sync to main DB
+                </Button>       
             </Flex>
         )
     }
@@ -258,16 +297,25 @@ const StoreProducts = () => {
         const productColumns=["ProductSKU","name","supplier","status","unit","regular_price","sale_price","id_in_store","category_id_in_store","supplier_id_in_store"];
         const resultColumns=["sku","result"];
         const changeColumns=["SKU","Name","Supplier","Details"];
+        const SyncResultsColumns=["SKU","Name","Supplier","Result","Details"];
 
         return(
             <>
                 {showResults && 
                 (<> 
-                <Heading level={5} >Results for products import from store</Heading>
+                <Heading level={5} >Results for new/removed products sync to DB</Heading>
                 <Flex   alignItems="center"    alignContent="flex-start" paddingTop="10px" paddingBottom="10px">
                     <CSVLink data={results} headers={resultColumns} filename={inputs.storename+"-import-results.csv"} className="amplify-button amplify-field-group__control">  Download results as CSV</CSVLink>
                 </Flex>
                 <OrderedDictionaryArrayTable items={results} columns={resultColumns}/>
+                </>)}
+                {showSyncFromStoreREsults && 
+                (<> 
+                <Heading level={5} >Results of syncing updates from store</Heading>
+                <Flex   alignItems="center"    alignContent="flex-start" paddingTop="10px" paddingBottom="10px">
+                    <CSVLink data={results} headers={SyncResultsColumns} filename={inputs.storename+"-import-results.csv"} className="amplify-button amplify-field-group__control">  Download results as CSV</CSVLink>
+                </Flex>
+                <OrderedDictionaryArrayTable items={results} columns={SyncResultsColumns}/>
                 </>)}
                 {showProducts &&
                 ( <>

@@ -107,7 +107,7 @@ export default function FileUploader(props) {
             console.log("Error: ",message);
             setStatus(message);
         } else {
-            const payload=JSON.parse(results["Payload"]);
+            const payload=JSON.parse(results["Payload"]); 
 
             if (payload.body.length === 0) {//empty
                 setStatus("Failed to upload file, empty response");

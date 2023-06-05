@@ -82,6 +82,25 @@ const COGNITO_IDP=process.env.REACT_APP_COGNITO_IDP;
 
   }
 
+  export async function syncStoreToMainDB(storename,suppliername) {
+    var commizurl = BASEURL + 'products/import_changes_from_store/' + storename;
+
+    if (suppliername !== "") {  
+      commizurl = commizurl + '?supplier=' + suppliername;
+    } 
+
+    console.log("In syncStoreToMainDB ",commizurl);
+    try {
+      const res = await fetch(commizurl,{method: "POST"});
+      const result = await res.json();
+      console.log(result);
+      return (result);
+    }
+    catch (err) {
+      return("result: " +err);
+    }
+
+  }
   export async function fetchStores(setStores) {
   
     var commizurl = BASEURL + 'stores';
