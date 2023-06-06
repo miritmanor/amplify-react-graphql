@@ -69,6 +69,7 @@ const StoreProducts = () => {
         setShowProducts(false);
         setResults([]);
         setShowResults(false);
+        setShowSyncFromStoreResults(false);
         setChanges([]);
         setShowChanges(false);
         if (!Object.hasOwn(inputs, 'storename') || !inputs.storename) {
