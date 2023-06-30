@@ -24,6 +24,7 @@ const App = ({ signOut }) => {
           <Route path="products" element={<Products />} />
           <Route path="storeproducts" element={<StoreProducts />} />
           <Route path="applyChanges" element={<ApplyChanges />} />
+
           <Route path="suppliers" element={<Suppliers />} />
           <Route path="stores" element={<Stores />} />
           <Route path="*" element={<NoPage />} />

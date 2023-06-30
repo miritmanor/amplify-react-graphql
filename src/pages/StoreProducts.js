@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
-import {fetchStores,fetchSuppliers,syncStoreToMainDB,invokeLambdaDirectly,checkServerResponse} from "../lambdaAccess.js";
-import {OrderedDictionaryArrayTable} from "../OrderedDictionaryArrayTable.js";
+import {fetchStores,fetchSuppliers,syncStoreToMainDB,invokeLambdaDirectly,checkServerResponse} from "../utils/lambdaAccess.js";
+import {OrderedDictionaryArrayTable} from "../utils/OrderedDictionaryArrayTable.js";
 import { CSVLink } from "react-csv";
 import {
   Button,
@@ -10,8 +10,8 @@ import {
   View,
   Heading,
 } from "@aws-amplify/ui-react";
-import {Status} from "../status.js";
-import {isInSearchTerm} from "../search.js"
+import {Status} from "../utils/status.js";
+import {isInSearchTerm} from "../utils/search.js"
 
 
 const StoreProducts = () => {

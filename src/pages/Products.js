@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import { CSVLink } from "react-csv";
 import "../App.css";
 import "@aws-amplify/ui-react/styles.css";
-import {fetchProducts,fetchProduct,modifyProduct} from "../lambdaAccess.js";
+import {fetchProducts,fetchProduct,modifyProduct} from "../utils/lambdaAccess.js";
 //import {MyTable,Table} from "../mapToTable.js";
-import {OrderedDictionaryArrayTable} from "../OrderedDictionaryArrayTable.js";
+import {OrderedDictionaryArrayTable} from "../utils/OrderedDictionaryArrayTable.js";
 //import {fetchSuppliers} from "../lambdaAccess.js";
 import FileUploader from "./upload";
-import {isInSearchTerm} from "../search.js"
+import {isInSearchTerm} from "../utils/search.js"
 
 //import { API } from "aws-amplify";
 import {

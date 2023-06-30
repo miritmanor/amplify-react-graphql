@@ -30,6 +30,26 @@ const COGNITO_IDP=process.env.REACT_APP_COGNITO_IDP;
 
   }
 
+  export async function getS3FileContents(filename,setFileContent) {
+    // /changes/s3file/{filename+} 
+
+    var encoded=encodeURIComponent(filename);
+    console.log("encoded: ",encoded);
+
+    var commizurl = BASEURL + 'changes/s3file/' + encoded;
+    console.log("In getS3FileContents ",commizurl);
+    console.log("filename: ",filename);
+
+
+    fetch(commizurl)
+       .then(response => response.json())
+       .then(data => {
+           console.log(data);
+           setFileContent(data);
+       })
+
+  }
+
   export async function fetchProduct(sku) {
     var commizurl = BASEURL + 'products/' + sku;
 
@@ -82,6 +102,23 @@ const COGNITO_IDP=process.env.REACT_APP_COGNITO_IDP;
 
   }
 
+  export async function updateStoreFromList(storename,values) {
+    var commizurl = BASEURL + 'changes/' + storename;
+
+    console.log("In updateStoreFromList ",commizurl);
+    console.log("values: ",values);
+    try {
+      const res = await fetch(commizurl,{method: "POST",body: JSON.stringify(values)});
+      const result = await res.json();
+      console.log(result);
+      return (result);
+    }
+    catch (err) {
+      return("result: " +err);
+    }
+
+  }
+
   export async function syncStoreToMainDB(storename,suppliername) {
     var commizurl = BASEURL + 'products/import_changes_from_store/' + storename;
 
@@ -101,6 +138,7 @@ const COGNITO_IDP=process.env.REACT_APP_COGNITO_IDP;
     }
 
   }
+
   export async function fetchStores(setStores) {
   
     var commizurl = BASEURL + 'stores';

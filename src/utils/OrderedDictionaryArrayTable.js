@@ -1,6 +1,7 @@
 import React,{ useState } from 'react';
 
 export function OrderedDictionaryArrayTable(props) {
+  // eslint-disable-next-line 
   const [selectedLine, setSelectedLine] = useState(null);
   const dictionaries = props.items;
   const columnOrder = props.columns;

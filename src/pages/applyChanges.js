@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import {invokeLambdaDirectly,checkServerResponse} from "../lambdaAccess.js";
-import {fetchStores,fetchSuppliers} from "../lambdaAccess.js";
-import {OrderedDictionaryArrayTable} from "../OrderedDictionaryArrayTable.js";
-import {Status} from "../status.js";
-//import Multiselect from "@cloudscape-design/components/multiselect";
+import {invokeLambdaDirectly,checkServerResponse,updateStoreFromList} from "../utils/lambdaAccess.js";
+import {fetchStores,fetchSuppliers} from "../utils/lambdaAccess.js";
+import {OrderedDictionaryArrayTable} from "../utils/OrderedDictionaryArrayTable.js";
+import {Status} from "../utils/status.js";
+import FileUploader from "../components/FileUploader.js";
+
 import {
     Button,
     SelectField,  
@@ -34,26 +35,26 @@ const ApplyChanges = () => {
         fetchSuppliers(setSuppliers,""); // fetch all suppliers, not filtered by store, as there is no store selection yet
       }, []);
 
-      /*
-    useEffect(() => {
-
-       var checked=[];
-        for (var s in stores) {
-            checked[stores[s].StoreName] = false;
+ 
+    const setStatusMultipleStores = () => {
+        var message = "";
+        for (var i in storeUpdateStatus) {
+            message = message+ storeUpdateStatus[i] + ", ";
         }
-        setCheckStores(checked);
+        setStatus(message);
+    }
 
-        console.log("initialized checkStores:",checkStores);
-// eslint-disable-next-line
-    }, [stores]);
-    */
-
+     const setResultsMultipleStoreUpdates = () => {
+        var resultList=[];
+        for (var i in storeUpdateResults) {
+            resultList = resultList.concat(storeUpdateResults[i]);
+        }
+        setChanges(resultList);
+    }
 
     async function applyOneStore(storename,supplier) {
         
         try {
-            console.log("invoking lambda now");
-            //storeUpdateStatus.push({storename:[]})
             const queryStringParameters={
                 supplier: supplier
             }
@@ -95,28 +96,6 @@ const ApplyChanges = () => {
         }
     }
 
-    const displayMultipleStatus = () => {
-        var message = "";
-        for (var i in storeUpdateStatus) {
-            message = message+ storeUpdateStatus[i] + ", ";
-        }
-    
-        setStatus(message);
-    }
-
-     const displayMultipleResults = () => {
-
-        var changelist=[];
-        //console.log(changelist);
-        for (var i in storeUpdateResults) {
-            //console.log("i:",i," results:",storeUpdateResults[i]);
-            changelist = changelist.concat(storeUpdateResults[i]);
-        }
-        console.log(changelist);
-        setChanges(changelist);
-        
-    }
-
     const applyToStores = () => {
         console.log("in applytoStores");
         //setInputs(values => ({...values,  applyToStore: true }));
@@ -145,12 +124,12 @@ const ApplyChanges = () => {
                     const message=checkServerResponse(res);
                     if (message !== "") {
                         console.log("Error: ",message);
-                        displayMultipleStatus();
-                        displayMultipleResults();
+                        setStatusMultipleStores();
+                        setResultsMultipleStoreUpdates();
                     }
                     else {
-                        displayMultipleStatus();
-                        displayMultipleResults();
+                        setStatusMultipleStores();
+                        setResultsMultipleStoreUpdates();
                         //type="results";
 
                     }
@@ -164,11 +143,91 @@ const ApplyChanges = () => {
   
     }
 
- 
+    async function applyValuesOneStore(storename,values) {
+        
+        try {
+
+            storeUpdateStatus[storename]="Waiting for store "+ storename;
+   
+            const response = await updateStoreFromList(storename,values);
+            console.log(response);
+
+            const message=checkServerResponse(response);
+            if (message !== "") {
+                console.log("Error: ",message);
+                storeUpdateStatus[storename]="Failed applying to store "+ storename + ": " + message;
+                storeUpdateResults[storename]="";
+            }
+            else {
+                const payload= JSON.parse(response.Payload);
+                const body=JSON.parse(payload.body);
+                console.log("body:",body);
+                if (body.length ===0) {
+                    storeUpdateStatus[storename]="No differences found for store "+ storename ;
+                } else {
+                    storeUpdateStatus[storename]="Completed applying to store "+ storename;
+                }
+
+                // prepare to display - add to each line also a 'store' attribute
+                const storeResults = body.map( (line) => (  
+                    {...line, Store:storename}
+                ));
+
+                storeUpdateResults[storename]=storeResults;
+            }
+            return(response);
+        } catch (error) {
+            console.error(error);
+            const response=error;
+            storeUpdateStatus[storename]="Problems while applying to store "+ storename + ": " + error;
+            storeUpdateResults[storename]=[];
+            return(response);
+        }
+    }
+
+    const applyValuesToStores = (values) => {
+        console.log("in applyValuesToStores");
+        //setInputs(values => ({...values,  applyToStore: true }));
+        console.log("inputs:",inputs);
+
+        console.log("selected stores: ",selectedStores);
+
+        if (selectedStores.length !== 0) {
+            var message = "Applying changes to stores: ";
+            for (var i in selectedStores) {
+                message = message+ selectedStores[i] + ", ";
+            }
+            message = message + "..."
+    
+            setStatus(message);
+
+            setStoreUpdateStatus([]);
+            setStoreUpdateResults([]);
+            setChanges([]);
+            for (i in selectedStores) {
+                //var storename=selectedStores[i];
+                applyValuesOneStore(selectedStores[i],values).then(res => {
+                    console.log(res);
+                    const message=checkServerResponse(res);
+                    if (message !== "") {
+                        console.log("Error: ",message);
+                        setStatusMultipleStores();
+                        setResultsMultipleStoreUpdates();
+                    }
+                    else {
+                        setStatusMultipleStores();
+                        setResultsMultipleStoreUpdates();
+                    }
+                });
+            }
+        } else {
+            setStatus("No stores selected");
+            setChanges([]);
+        }
+  
+    }
 
     function InputForm() {
-
-
 
         const CheckboxSelectStores = () => {
             console.log("in CheckboxSelectStores:" );
@@ -198,37 +257,16 @@ const ApplyChanges = () => {
  
             return (
               <Flex direction="row" gap="0" paddingTop="5px">
-                {/*}
-                <CheckboxField
-                  name="all-stores"
-                  label="All stores"
-                  value="allStores"
-                  checked={allChecked}
-                  isIndeterminate={isIndeterminate}
-                  onChange={handleAllStoresSelection}
-                />
-            */}
                 <Text paddingTop="20px">Select stores</Text>
                 <View paddingLeft="20px" paddingTop="10px" paddingRight="30px">
                     {stores && stores.map((store) => (
-                        <CheckboxField value={store.StoreName} name={store.StoreName} label={store.StoreName} checked={selectedStores.includes(store.StoreName)} onChange={handleStoreSelectionChange}/>
+                        <CheckboxField key={store.StoreName} value={store.StoreName} name={store.StoreName} label={store.StoreName} checked={selectedStores.includes(store.StoreName)} onChange={handleStoreSelectionChange}/>
                     ))} 
                 </View>
               </Flex>
             );
           };
-/*
-        const handleStoreChange = (event) => {
-            const name = event.target.name;
-            const value = event.target.value;
-            setInputs(values => ({...values, [name]: value}))
-            setStatus("");
-            setChanges([]);
-            //inputs.supplier="";
-            setSuppliers([]);
-            fetchSuppliers(setSuppliers,event.target.value);
-        }
- */
+
         const handleSupplierChange = (event) => {
             const name = event.target.name;
             const value = event.target.value;
@@ -236,20 +274,38 @@ const ApplyChanges = () => {
             setStatus("");
             setChanges([]);
         }
+
+        const [showImportForm,setShowImportForm] = useState(false);
+        const [importButtonText,setImportButtonText] = useState("Import changes from CSV/Excel");
+        function showImportButton() {
+            console.log("in showImportButton");
+          if (showImportForm) {
+            setShowImportForm(false);
+            setImportButtonText("Import changes from CSV/Excel");
+          } else {
+            console.log("showing import form");
+            setShowImportForm(true);
+            setImportButtonText("Hide import form");
+          }
+        }
  
-        return (
-            <Flex   alignItems="center"    alignContent="flex-start" >
-                <SelectField  key="supplier" name="supplier" placeholder="All suppliers" value={inputs.supplier || ""}  onChange={handleSupplierChange}>
-                        {suppliers && suppliers.map((supplier) => (
-                            <option value={supplier}>
-                                {supplier}
-                            </option>
-                        ))}
-                </SelectField>
-                <CheckboxSelectStores></CheckboxSelectStores>
-                <Button key="applydiffs" name="apply_changes" onClick={applyToStores} >
-                    Apply changes
-                </Button>
+        return ( 
+            <Flex   alignItems="left"    alignContent="flex-start"  direction="column">
+                <Flex   alignItems="center"    alignContent="flex-start" >
+                    <SelectField  key="supplier" name="supplier" placeholder="All suppliers" value={inputs.supplier || ""}  onChange={handleSupplierChange}>
+                            {suppliers && suppliers.map((supplier) => (
+                                <option key={supplier} value={supplier}>
+                                    {supplier}
+                                </option>
+                            ))}
+                    </SelectField>
+                    <CheckboxSelectStores></CheckboxSelectStores>
+                    <Button key="applydiffs" name="apply_changes" onClick={applyToStores} >
+                        Apply differences from DB
+                    </Button>
+                    <Button key="showImportButton" name="show_import_button" onClick={showImportButton}>{importButtonText}</Button>
+                </Flex>
+                 {showImportForm && <FileUploader applyToStores={applyValuesToStores}/>}
             </Flex>
         )
     }
@@ -281,7 +337,5 @@ const ApplyChanges = () => {
         </div>
     );
 };
-
-
 
 export default ApplyChanges;

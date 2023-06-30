@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "../App.css";
 import "@aws-amplify/ui-react/styles.css";
-import {fetchStores} from "../lambdaAccess.js";
-import {OrderedDictionaryArrayTable} from "../OrderedDictionaryArrayTable.js";
+import {fetchStores} from "../utils/lambdaAccess.js";
+import {OrderedDictionaryArrayTable} from "../utils/OrderedDictionaryArrayTable.js";
 
 import {
   View,

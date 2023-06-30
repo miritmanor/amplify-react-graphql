@@ -2,9 +2,9 @@
 import { Storage } from 'aws-amplify';
 import React, { useRef } from 'react';
 import { useState } from 'react';
-import {invokeLambdaDirectly,checkServerResponse} from "../lambdaAccess.js";
-import {Table} from "../mapToTable.js";
-import {Status} from "../status.js";
+import {invokeLambdaDirectly,checkServerResponse} from "../utils/lambdaAccess.js";
+import {OrderedDictionaryArrayTable} from "../utils/OrderedDictionaryArrayTable.js";
+import {Status} from "../utils/status.js";
 import {
   Flex,
   Button,
@@ -162,12 +162,12 @@ export default function FileUploader(props) {
 
   function DisplayContent() {
 
-
+    const columns=['sku', 'result', 'details'];
     if (uploadResults.length !== 0) {
         return (
           <div> 
           <Heading level={5} paddingBottom="5px">Results of changes to products</Heading>
-           <Table rowList={uploadResults} rowkey='sku' />
+           <OrderedDictionaryArrayTable items={uploadResults} columns={columns}/>
            </div>
         )
     } else {
