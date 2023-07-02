@@ -44,7 +44,7 @@ const ApplyChanges = () => {
         setStatus(message);
     }
 
-     const setResultsMultipleStoreUpdates = () => {
+    const setResultsMultipleStoreUpdates = () => {
         var resultList=[];
         for (var i in storeUpdateResults) {
             resultList = resultList.concat(storeUpdateResults[i]);

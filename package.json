@@ -40,6 +40,16 @@
     ]
   },
   "devDependencies": {
-    "react-router-dom": "^6.9.0"
+    "react-router-dom": "^6.9.0",
+    "typescript": "^5.1.6"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "\\.(css|less)$": "<rootDir>/src/__mocks__/styleMock.js"
+    },
+    "modulePaths": [
+      "<rootDir>/src",
+      "<rootDir>/node_modules/@aws-amplify/ui-react"
+    ]
   }
 }
