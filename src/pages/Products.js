@@ -3,20 +3,16 @@ import { CSVLink } from "react-csv";
 import "../App.css";
 import "@aws-amplify/ui-react/styles.css";
 import {fetchProducts,fetchProduct,modifyProduct} from "../utils/lambdaAccess.js";
-//import {MyTable,Table} from "../mapToTable.js";
-import {OrderedDictionaryArrayTable} from "../utils/OrderedDictionaryArrayTable.js";
-//import {fetchSuppliers} from "../lambdaAccess.js";
-import FileUploader from "./upload";
+import {OrderedDictionaryArrayTable} from "../components/OrderedDictionaryArrayTable.js";
+import FileUploader from "../components/upload";
 import {isInSearchTerm} from "../utils/search.js"
 
-//import { API } from "aws-amplify";
 import {
   Flex,
   Heading,
   View,
   Button,
   TextField,
-  //SelectField,
 } from "@aws-amplify/ui-react";
 
 
@@ -24,14 +20,10 @@ const Products = () => {
   const [products,setProducts] = useState([]);
   const [filteredProducts,setFilteredProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  //const [inputs, setInputs] = useState({});
-  //const [suppliers,setSuppliers] = useState([]);
 
   // only on first render - fetch products. when done it will set the products array
   useEffect(() => {
-    //console.log("in useEffect - fetching");
     fetchProducts(setProducts);
-    //fetchSuppliers(setSuppliers,"");
   }, []);
 
   // when products changes, initiate filteredProducts to the same array
@@ -227,25 +219,6 @@ const Products = () => {
   return (
     <View  style={{ marginTop: '30px' }}>
       <h2>Commiz main database</h2>
-
-      {/*<InputForm/>*/}
-      {/*
-      <View as="form" margin="3rem 0" onSubmit={createProduct}>
-        <Flex direction="row" justifyContent="center">
-          <TextField
-            name="name"
-            placeholder="Note Name"
-            label="Note Name"
-            labelHidden
-            variation="quiet"
-            required
-          />
-          <Button type="submit" variation="primary">
-            Create Note
-          </Button>
-        </Flex>
-      </View>
-     */}
      
       <Flex   alignItems="center"    alignContent="flex-start" paddingTop="10px" paddingBottom="20px">
         <input type="text" placeholder="Search products" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />

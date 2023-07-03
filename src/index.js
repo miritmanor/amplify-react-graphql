@@ -7,8 +7,6 @@ import reportWebVitals from './reportWebVitals';
 import { Amplify } from 'aws-amplify';
 import config from './aws-exports';
 
-//import { Auth, Storage } from 'aws-amplify';
-
 console.log("config: ",config);
 Amplify.configure(config);
 

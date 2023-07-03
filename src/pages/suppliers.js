@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../App.css";
 import "@aws-amplify/ui-react/styles.css";
 import {fetchSuppliersFullDetails} from "../utils/lambdaAccess.js";
-import {OrderedDictionaryArrayTable} from "../utils/OrderedDictionaryArrayTable.js";
+import {OrderedDictionaryArrayTable} from "../components/OrderedDictionaryArrayTable.js";
 
 import {
   Flex,

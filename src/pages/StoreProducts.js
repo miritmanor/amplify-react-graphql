@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import {fetchStores,fetchSuppliers,syncStoreToMainDB,invokeLambdaDirectly,checkServerResponse} from "../utils/lambdaAccess.js";
-import {OrderedDictionaryArrayTable} from "../utils/OrderedDictionaryArrayTable.js";
+import {OrderedDictionaryArrayTable} from "../components/OrderedDictionaryArrayTable.js";
 import { CSVLink } from "react-csv";
 import {
   Button,
@@ -264,7 +264,7 @@ const StoreProducts = () => {
             <Flex   alignItems="center"    alignContent="flex-start"  >
                 <SelectField  key="storename" name="storename"  placeholder="Select store" value={inputs.storename || ""}  onChange={handleStoreChange}>
                         {stores && stores.map((store) => (
-                            <option value={store.StoreName}>
+                            <option value={store.StoreName} key={store.StoreName}>
                                 {store.StoreName}
                             </option>
                         ))}
@@ -272,7 +272,7 @@ const StoreProducts = () => {
                 </SelectField>
                 <SelectField  key="supplier" name="supplier" placeholder="All suppliers" value={inputs.supplier || ""}  onChange={handleSupplierChange}>
                         {suppliers && suppliers.map((supplier) => (
-                            <option value={supplier}>
+                            <option value={supplier}  key={supplier}>
                                 {supplier}
                             </option>
                         ))}

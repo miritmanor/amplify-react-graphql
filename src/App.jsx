@@ -5,7 +5,7 @@ import {
 } from "@aws-amplify/ui-react";
 import Products from "./pages/Products";
 import StoreProducts from "./pages/StoreProducts";
-import ApplyChanges from "./pages/applyChanges";
+import ApplyChanges from "./pages/ApplyChangesPage/ApplyChangesPage";
 import Suppliers from "./pages/suppliers";
 import Stores from "./pages/stores";
 import Tabs from './components/tabs';
