@@ -6,7 +6,7 @@ import {
 import { Storage } from "aws-amplify";
 import { getS3FileContents } from "../utils/lambdaAccess.js";
 import { fetchStores } from "../utils/lambdaAccess.js";
-import { OrderedDictionaryArrayTable } from "../components/OrderedDictionaryArrayTable.js";
+import { OrderedDictionaryArrayTable } from "../components/OrderedDictionaryArrayTable.jsx";
 import { Status } from "../utils/status.js";
 import {
   Flex,

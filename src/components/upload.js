@@ -3,7 +3,7 @@ import { Storage } from 'aws-amplify';
 import React, { useRef } from 'react';
 import { useState } from 'react';
 import {invokeLambdaDirectly,checkServerResponse} from "../utils/lambdaAccess.js";
-import {OrderedDictionaryArrayTable} from "./OrderedDictionaryArrayTable.js";
+import {OrderedDictionaryArrayTable} from "./OrderedDictionaryArrayTable.jsx";
 import {Status} from "../utils/status.js";
 import {
   Flex,

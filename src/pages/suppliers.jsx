@@ -1,25 +1,20 @@
 import React, { useState, useEffect } from "react";
 import "../App.css";
 import "@aws-amplify/ui-react/styles.css";
-import {fetchSuppliersFullDetails} from "../utils/lambdaAccess.js";
-import {OrderedDictionaryArrayTable} from "../components/OrderedDictionaryArrayTable.js";
+import { fetchSuppliersFullDetails } from "../utils/lambdaAccess.js";
+import { OrderedDictionaryArrayTable } from "../components/OrderedDictionaryArrayTable.jsx";
 
-import {
-  Flex,
-  View,
-} from "@aws-amplify/ui-react";
-
+import { Flex, View } from "@aws-amplify/ui-react";
 
 const Suppliers = () => {
-  const [suppliers,setSuppliers] = useState([]);
-  const [filteredSuppliers,setFilteredSuppliers] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
+  const [filteredSuppliers, setFilteredSuppliers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-
 
   // only on first render - fetch suppliers. when done it will set the suppliers array
   useEffect(() => {
     console.log("in useEffect - fetching");
-    fetchSuppliersFullDetails(setSuppliers,"");
+    fetchSuppliersFullDetails(setSuppliers, "");
   }, []);
 
   // when suppliers changes, initiate filteredSuppliers to the same array
@@ -43,26 +38,29 @@ const Suppliers = () => {
         return false;
       });
       setFilteredSuppliers(p);
-     }, 500);
+    }, 500);
     return () => clearTimeout(timeOutId);
-  }, [searchTerm,suppliers]);
+  }, [searchTerm, suppliers]);
 
-
-  const columns=["supplier_name","stores"];
-
+  const columns = ["supplier_name", "stores"];
 
   return (
-    <View style={{ marginTop: '50px' }}>
+    <View style={{ marginTop: "50px" }}>
       <h2>Commiz suppliers in main DB </h2>
-      <Flex   alignItems="center"    alignContent="flex-start" >
-        <input type="text" placeholder="Search suppliers" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+      <Flex alignItems="center" alignContent="flex-start">
+        <input
+          type="text"
+          placeholder="Search suppliers"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
       </Flex>
-      <OrderedDictionaryArrayTable items={filteredSuppliers} columns={columns}/>
-
+      <OrderedDictionaryArrayTable
+        items={filteredSuppliers}
+        columns={columns}
+      />
     </View>
   );
 };
-
-
 
 export default Suppliers;

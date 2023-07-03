@@ -4,7 +4,7 @@ import {
   checkServerResponse,
 } from "../utils/lambdaAccess.js";
 import { fetchStores, fetchSuppliers } from "../utils/lambdaAccess.js";
-import { OrderedDictionaryArrayTable } from "../components/OrderedDictionaryArrayTable.js";
+import { OrderedDictionaryArrayTable } from "../components/OrderedDictionaryArrayTable.jsx";
 import { Status } from "../utils/status.js";
 import {
   Button,
