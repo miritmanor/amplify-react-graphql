@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  checkServerResponse,
-  updateStoreFromList,
-} from "../utils/lambdaAccess.js";
+import { updateStoreFromList } from "../utils/lambdaAccess.js";
 import { Storage } from "aws-amplify";
 import { getS3FileContents } from "../utils/lambdaAccess.js";
 import { fetchStores } from "../utils/lambdaAccess.js";
@@ -29,6 +26,15 @@ const UpdateFromFile = () => {
   const [status, setStatus] = useState("");
   const [storeUpdateStatus, setStoreUpdateStatus] = useState([]);
   const [storeUpdateResults, setStoreUpdateResults] = useState([]);
+
+  const resultsColumns = [
+    "SKU",
+    "Name",
+    "Supplier",
+    "Result",
+    "Store",
+    "Details",
+  ];
 
   //Runs only on the first render
   useEffect(() => {
@@ -60,6 +66,7 @@ const UpdateFromFile = () => {
   const cleanup = () => {
     setStatus("");
     setFileContent([]);
+    setChanges([]);
   };
 
   const uploadFile = async (selectedFile) => {
@@ -70,6 +77,7 @@ const UpdateFromFile = () => {
       return;
     }
     cleanup();
+    setStatus("Uploading file " + selectedFile.name);
     try {
       const tempfilename = Date.now() + "-" + selectedFile.name;
       console.log("tempfilename: ", tempfilename);
@@ -80,6 +88,7 @@ const UpdateFromFile = () => {
       console.log("file uploaded" + tempfilename);
       await GetFileContents(tempfilename);
       console.log("file contents retrieved from file " + tempfilename);
+      setStatus("");
     } catch (error) {
       console.log("Error uploading file: ", error);
     }
@@ -154,33 +163,30 @@ const UpdateFromFile = () => {
 
       const response = await updateStoreFromList(storename, values);
       console.log(response);
-
-      const message = checkServerResponse(response);
-      if (message !== "") {
-        console.log("Error: ", message);
+      console.log("response type: ", typeof response);
+      if (typeof response === "string") {
+        // string means error
         storeUpdateStatus[storename] =
-          "Failed applying to store " + storename + ": " + message;
-        storeUpdateResults[storename] = "";
-      } else {
-        const payload = JSON.parse(response.Payload);
-        const body = JSON.parse(payload.body);
-        console.log("body:", body);
-        if (body.length === 0) {
-          storeUpdateStatus[storename] =
-            "No differences found for store " + storename;
-        } else {
-          storeUpdateStatus[storename] =
-            "Completed applying to store " + storename;
-        }
-
-        // prepare to display - add to each line also a 'store' attribute
-        const storeResults = body.map((line) => ({
-          ...line,
-          Store: storename,
-        }));
-
-        storeUpdateResults[storename] = storeResults;
+          "Failed to apply to store " + storename + ": " + response;
+        return response;
       }
+
+      const results = response;
+      if (results.length === 0) {
+        storeUpdateStatus[storename] =
+          "No differences found for store " + storename;
+      } else {
+        storeUpdateStatus[storename] =
+          "Completed applying to store " + storename;
+      }
+      // prepare to display - add to each line also a 'store' attribute
+      const storeResults = results.map((line) => ({
+        ...line,
+        Store: storename,
+      }));
+
+      storeUpdateResults[storename] = storeResults;
+
       return response;
     } catch (error) {
       console.error(error);
@@ -213,15 +219,8 @@ const UpdateFromFile = () => {
         //var storename=selectedStores[i];
         applyValuesOneStore(stores[i], values).then((res) => {
           console.log(res);
-          const message = checkServerResponse(res);
-          if (message !== "") {
-            console.log("Error: ", message);
-            setStatusMultipleStores();
-            setResultsMultipleStoreUpdates();
-          } else {
-            setStatusMultipleStores();
-            setResultsMultipleStoreUpdates();
-          }
+          setStatusMultipleStores();
+          setResultsMultipleStoreUpdates();
         });
       }
     } else {
@@ -230,18 +229,20 @@ const UpdateFromFile = () => {
     }
   };
 
-  function DisplayContent() {
-    if (changes.length !== 0) {
-      const columns = ["SKU", "Name", "Supplier", "Result", "Store", "Details"];
-      return (
-        <>
-          <Heading level={4}>Results</Heading>
-          <OrderedDictionaryArrayTable items={changes} columns={columns} />
-        </>
-      );
-    } else {
-      return "";
-    }
+  function DisplayResults() {
+    return (
+      <>
+        {changes && changes.length !== 0 && (
+          <>
+            <Heading level={5}>Results</Heading>
+            <OrderedDictionaryArrayTable
+              items={changes}
+              columns={resultsColumns}
+            />
+          </>
+        )}
+      </>
+    );
   }
 
   return (
@@ -271,12 +272,16 @@ const UpdateFromFile = () => {
             <Status status={status} />{" "}
           </h4>
         </Flex>
-
+        <DisplayResults />
         {fileContent && fileContent.length !== 0 && (
-          <OrderedDictionaryArrayTable items={fileContent} columns={columns} />
+          <>
+            <Heading level={5}>File contents</Heading>
+            <OrderedDictionaryArrayTable
+              items={fileContent}
+              columns={columns}
+            />
+          </>
         )}
-
-        <DisplayContent />
       </Flex>
     </div>
   );

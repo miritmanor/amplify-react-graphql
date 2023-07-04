@@ -108,13 +108,30 @@ const COGNITO_IDP=process.env.REACT_APP_COGNITO_IDP;
     console.log("In updateStoreFromList ",commizurl);
     console.log("values: ",values);
     try {
-      const res = await fetch(commizurl,{method: "POST",body: JSON.stringify(values)});
-      const result = await res.json();
-      console.log(result);
-      return (result);
+      //const res = await fetch(commizurl,{method: "POST",body: JSON.stringify(values)});
+      //const result = await res.json();
+      const queryStringParameters = {};
+      const res = await invokeLambdaDirectly(
+        "POST",
+        "/changes/{storename+}",
+        "/changes/" + storename,
+        { storename: storename },
+        queryStringParameters,
+        JSON.stringify(values)
+      );
+      //console.log(res);
+      if (res.StatusCode === 200) {
+        const result = JSON.parse(res.Payload);
+        const body = JSON.parse(result.body);
+        console.log(body);
+        return (body);
+      } else {
+        console.log("error: ",res);
+        return("Failed to update store  " + storename);
+      }
     }
     catch (err) {
-      return("result: " +err);
+      return(err.message);
     }
 
   }
