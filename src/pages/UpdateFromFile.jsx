@@ -67,6 +67,7 @@ const UpdateFromFile = () => {
     setStatus("");
     setFileContent([]);
     setChanges([]);
+    setSelectedStores([]);
   };
 
   const analyzeGetResults = (results) => {
@@ -271,11 +272,13 @@ const UpdateFromFile = () => {
               ref={fileInputRef}
               onChange={handleFileSelect}
             />
-            <CheckboxSelectStores></CheckboxSelectStores>
             {fileContent && fileContent.length !== 0 && (
-              <Button onClick={handleApplyToStores}>
-                Apply to selected stores
-              </Button>
+              <>
+                <CheckboxSelectStores></CheckboxSelectStores>
+                <Button onClick={handleApplyToStores}>
+                  Apply to selected stores
+                </Button>
+              </>
             )}
           </Flex>
           <h4>

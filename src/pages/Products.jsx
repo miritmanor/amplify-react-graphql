@@ -17,6 +17,10 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [productSKU, setProductSKU] = useState("");
+  const [inputs, setInputs] = useState({});
+  const [DbValues, setDbValues] = useState({});
+  const [results, setResults] = useState("");
 
   // only on first render - fetch products. when done it will set the products array
   useEffect(() => {
@@ -44,10 +48,6 @@ const Products = () => {
     // eslint-disable-next-line
   }, [searchTerm]);
 
-  const [productSKU, setProductSKU] = useState("");
-  const [inputs, setInputs] = useState({});
-  const [DbValues, setDbValues] = useState({});
-  const [results, setResults] = useState("");
   const handleChange = (event) => {
     //console.log("handleChange");
     const name = event.target.name;
