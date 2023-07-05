@@ -30,22 +30,23 @@ const COGNITO_IDP=process.env.REACT_APP_COGNITO_IDP;
 
   }
 
-  export async function getS3FileContents(filename,setFileContent) {
+  export async function getS3FileContents(filename,setResults) {
     // /changes/s3file/{filename+} 
 
     var encoded=encodeURIComponent(filename);
-    console.log("encoded: ",encoded);
+    //console.log("encoded: ",encoded);
 
     var commizurl = BASEURL + 'changes/s3file/' + encoded;
     console.log("In getS3FileContents ",commizurl);
-    console.log("filename: ",filename);
+    //console.log("filename: ",filename);
 
 
     fetch(commizurl)
        .then(response => response.json())
        .then(data => {
+          console.log("file contents:");
            console.log(data);
-           setFileContent(data);
+           setResults(data);
        })
 
   }
@@ -106,7 +107,7 @@ const COGNITO_IDP=process.env.REACT_APP_COGNITO_IDP;
     var commizurl = BASEURL + 'changes/' + storename;
 
     console.log("In updateStoreFromList ",commizurl);
-    console.log("values: ",values);
+    //console.log("values: ",values);
     try {
       //const res = await fetch(commizurl,{method: "POST",body: JSON.stringify(values)});
       //const result = await res.json();
@@ -121,9 +122,10 @@ const COGNITO_IDP=process.env.REACT_APP_COGNITO_IDP;
       );
       //console.log(res);
       if (res.StatusCode === 200) {
+        console.log("success: ",res);
         const result = JSON.parse(res.Payload);
         const body = JSON.parse(result.body);
-        console.log(body);
+        //console.log(body);
         return (body);
       } else {
         console.log("error: ",res);

@@ -41,12 +41,12 @@ const UpdateFromFile = () => {
     fetchStores(setStores);
   }, []);
 
-  useEffect(() => {
-    console.log("file: ", file);
-  }, [file]);
+  useEffect(() => {}, [file]);
 
   useEffect(() => {
-    console.log("fileContent: ", fileContent);
+    //console.log("fileContent: ", fileContent);
+    console.log("new file content available. size is ", fileContent.length);
+    setStatus("");
     if (fileContent.length > 0 && fileContent[0]) {
       setColumns(Object.keys(fileContent[0]));
     }
@@ -69,9 +69,20 @@ const UpdateFromFile = () => {
     setChanges([]);
   };
 
+  const analyzeGetResults = (results) => {
+    //console.log("in analyzeGetResults");
+    //console.log("results: ", results);
+    //console.log("type: ", typeof results);
+    if (typeof results === "string") {
+      setStatus("Error retrieving file contents: " + results);
+      return;
+    }
+    setFileContent(results);
+  };
+
   const uploadFile = async (selectedFile) => {
     console.log("in uploadFile");
-    console.log(" file to upload is: ", selectedFile);
+    //console.log(" file to upload is: ", selectedFile);
     if (!selectedFile) {
       console.log("no file");
       return;
@@ -80,15 +91,22 @@ const UpdateFromFile = () => {
     setStatus("Uploading file " + selectedFile.name);
     try {
       const tempfilename = Date.now() + "-" + selectedFile.name;
-      console.log("tempfilename: ", tempfilename);
+      //console.log("tempfilename: ", tempfilename);
       //setFilename(tempfilename);
       await Storage.put(tempfilename, selectedFile, {
         //contentType: "image/png", // contentType is optional
+        progressCallback(progress) {
+          console.log(`Upload status: ${progress.loaded}/${progress.total}`);
+          if (progress.loaded === progress.total) {
+            setStatus("File uploaded. Retrieving file contents");
+            getS3FileContents(tempfilename, analyzeGetResults);
+          }
+        },
       });
-      console.log("file uploaded" + tempfilename);
-      await GetFileContents(tempfilename);
-      console.log("file contents retrieved from file " + tempfilename);
-      setStatus("");
+      //console.log("file " + tempfilename + " uploaded");
+      //console.log(rc);
+
+      //setStatus("");
     } catch (error) {
       console.log("Error uploading file: ", error);
     }
@@ -99,16 +117,6 @@ const UpdateFromFile = () => {
     applyValuesToStores(fileContent, selectedStores);
   };
 
-  const GetFileContents = async (filename) => {
-    console.log("in GetFileContents. filename: ", filename);
-    if (!filename) {
-      console.log("no filename");
-      return;
-    }
-    const res = await getS3FileContents(filename, setFileContent);
-    console.log("res from getS3FileContents: ", res);
-    console.log("fileContent:", fileContent);
-  };
   const CheckboxSelectStores = () => {
     //console.log("in CheckboxSelectStores:" );
 
@@ -162,8 +170,8 @@ const UpdateFromFile = () => {
       storeUpdateStatus[storename] = "Waiting for store " + storename;
 
       const response = await updateStoreFromList(storename, values);
-      console.log(response);
-      console.log("response type: ", typeof response);
+      //console.log(response);
+      //console.log("response type: ", typeof response);
       if (typeof response === "string") {
         // string means error
         storeUpdateStatus[storename] =
@@ -218,7 +226,7 @@ const UpdateFromFile = () => {
       for (i in stores) {
         //var storename=selectedStores[i];
         applyValuesOneStore(stores[i], values).then((res) => {
-          console.log(res);
+          //console.log(res);
           setStatusMultipleStores();
           setResultsMultipleStoreUpdates();
         });
