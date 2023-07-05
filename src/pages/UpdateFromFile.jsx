@@ -255,7 +255,9 @@ const UpdateFromFile = () => {
 
   return (
     <div style={{ marginTop: "30px" }}>
-      <h3>Select file to import updates from stores</h3>
+      <h3>
+        Select file to upload updates. Later you can select and update stores.
+      </h3>
       <Flex alignItems="left" alignContent="flex-start" direction="column">
         <Flex alignItems="left" alignContent="flex-start" direction="column">
           <Flex alignItems="center" alignContent="flex-start">
