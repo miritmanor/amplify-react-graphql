@@ -4,7 +4,7 @@ import { Storage } from "aws-amplify";
 import { getS3FileContents } from "../utils/lambdaAccess.js";
 import { fetchStores } from "../utils/lambdaAccess.js";
 import { OrderedDictionaryArrayTable } from "../components/OrderedDictionaryArrayTable.jsx";
-import { Status } from "../utils/status.js";
+import { Status, setMultipleStatus } from "../utils/Status.js";
 import {
   Flex,
   Heading,
@@ -21,7 +21,6 @@ const UpdateFromFile = () => {
   const fileInputRef = useRef(null);
   const [stores, setStores] = useState([]);
   const [selectedStores, setSelectedStores] = useState([]);
-
   const [changes, setChanges] = useState([]);
   const [status, setStatus] = useState("");
   const [storeUpdateStatus, setStoreUpdateStatus] = useState([]);
@@ -40,8 +39,6 @@ const UpdateFromFile = () => {
   useEffect(() => {
     fetchStores(setStores);
   }, []);
-
-  useEffect(() => {}, [file]);
 
   useEffect(() => {
     //console.log("fileContent: ", fileContent);
@@ -68,6 +65,9 @@ const UpdateFromFile = () => {
     setFileContent([]);
     setChanges([]);
     setSelectedStores([]);
+
+    setStoreUpdateStatus([]);
+    setStoreUpdateResults([]);
   };
 
   const analyzeGetResults = (results) => {
@@ -151,11 +151,7 @@ const UpdateFromFile = () => {
   };
 
   const setStatusMultipleStores = () => {
-    var message = "";
-    for (var i in storeUpdateStatus) {
-      message = message + storeUpdateStatus[i] + ", ";
-    }
-    setStatus(message);
+    setStatus(setMultipleStatus(storeUpdateStatus));
   };
 
   const setResultsMultipleStoreUpdates = () => {
@@ -166,7 +162,7 @@ const UpdateFromFile = () => {
     setChanges(resultList);
   };
 
-  async function applyValuesOneStore(storename, values) {
+  const applyValuesOneStore = async (storename, values) => {
     try {
       storeUpdateStatus[storename] = "Waiting for store " + storename;
 
@@ -205,7 +201,7 @@ const UpdateFromFile = () => {
       storeUpdateResults[storename] = [];
       return response;
     }
-  }
+  };
 
   const applyValuesToStores = (values, stores) => {
     console.log("in applyValuesToStores");
@@ -219,15 +215,14 @@ const UpdateFromFile = () => {
       }
       message = message + "...";
 
+      cleanup();
       setStatus(message);
 
-      setStoreUpdateStatus([]);
-      setStoreUpdateResults([]);
-      setChanges([]);
+      //setStoreUpdateStatus([]);
+      //setStoreUpdateResults([]);
+      //setChanges([]);
       for (i in stores) {
-        //var storename=selectedStores[i];
         applyValuesOneStore(stores[i], values).then((res) => {
-          //console.log(res);
           setStatusMultipleStores();
           setResultsMultipleStoreUpdates();
         });
@@ -238,7 +233,7 @@ const UpdateFromFile = () => {
     }
   };
 
-  function DisplayResults() {
+  const DisplayResults = () => {
     return (
       <>
         {changes && changes.length !== 0 && (
@@ -252,7 +247,7 @@ const UpdateFromFile = () => {
         )}
       </>
     );
-  }
+  };
 
   return (
     <div style={{ marginTop: "30px" }}>

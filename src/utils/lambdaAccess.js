@@ -41,13 +41,18 @@ const COGNITO_IDP=process.env.REACT_APP_COGNITO_IDP;
     //console.log("filename: ",filename);
 
 
-    fetch(commizurl)
-       .then(response => response.json())
-       .then(data => {
-          console.log("file contents:");
-           console.log(data);
-           setResults(data);
-       })
+    try { 
+      fetch(commizurl)
+        .then(response => response.json())
+        .then(data => {
+            console.log("file contents:");
+            console.log(data);
+            setResults(data);
+        })
+      } catch (err) {
+        console.error("error while getting file contents: ",err);
+        setResults([]);
+      }
 
   }
 

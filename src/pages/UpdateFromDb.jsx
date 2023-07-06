@@ -5,7 +5,7 @@ import {
 } from "../utils/lambdaAccess.js";
 import { fetchStores, fetchSuppliers } from "../utils/lambdaAccess.js";
 import { OrderedDictionaryArrayTable } from "../components/OrderedDictionaryArrayTable.jsx";
-import { Status } from "../utils/status.js";
+import { Status, setMultipleStatus } from "../utils/Status.js";
 import {
   Button,
   SelectField,
@@ -34,11 +34,7 @@ const UpdateFromDb = () => {
   }, []);
 
   const setStatusMultipleStores = () => {
-    var message = "";
-    for (var i in storeUpdateStatus) {
-      message = message + storeUpdateStatus[i] + ", ";
-    }
-    setStatus(message);
+    setStatus(setMultipleStatus(storeUpdateStatus));
   };
 
   const setResultsMultipleStoreUpdates = () => {

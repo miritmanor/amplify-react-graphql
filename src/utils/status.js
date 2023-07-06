@@ -1,6 +1,6 @@
 
 
-export function Status({status}) {
+export const Status = ({status}) => {
 
     console.log("status:",status);
     const s = status.toString();
@@ -12,5 +12,14 @@ export function Status({status}) {
         </>
     );
 }
+
+export const setMultipleStatus = (statusList) => {
+    var message = "";
+    for (var i in statusList) {
+      message = message + statusList[i] + ", ";
+    }
+    return(message);
+  };
+
 
 
