@@ -6,6 +6,7 @@ import {
 import { fetchStores, fetchSuppliers } from "../utils/lambdaAccess.js";
 import { OrderedDictionaryArrayTable } from "../components/OrderedDictionaryArrayTable.jsx";
 import { Status, setMultipleStatus } from "../utils/status.js";
+import { MultipleLists } from "../utils/lists.js";
 import {
   Button,
   SelectField,
@@ -27,6 +28,9 @@ const UpdateFromDb = () => {
   const [storeUpdateStatus, setStoreUpdateStatus] = useState([]);
   const [storeUpdateResults, setStoreUpdateResults] = useState([]);
 
+  const [storeGetDiffsStatus, setStoreGetDiffsStatus] = useState([]);
+  const [storeDifferences, setStoreDifferences] = useState([]);
+
   useEffect(() => {
     //Runs only on the first render
     fetchStores(setStores);
@@ -38,11 +42,15 @@ const UpdateFromDb = () => {
   };
 
   const setResultsMultipleStoreUpdates = () => {
-    var resultList = [];
-    for (var i in storeUpdateResults) {
-      resultList = resultList.concat(storeUpdateResults[i]);
-    }
-    setChanges(resultList);
+    setChanges(MultipleLists(storeUpdateResults));
+  };
+
+  const setDiffStatusMultipleStores = () => {
+    setStatus(setMultipleStatus(setStoreGetDiffsStatus));
+  };
+
+  const setDiffsMultipleStores = () => {
+    setChanges(MultipleLists(storeDifferences));
   };
 
   async function applyOneStore(storename, supplier) {
@@ -99,46 +107,110 @@ const UpdateFromDb = () => {
     }
   }
 
-  const applyToStores = () => {
-    console.log("in applytoStores");
-    //setInputs(values => ({...values,  applyToStore: true }));
-    console.log("inputs:", inputs);
+  async function viewDiffsSingleStore(storename, supplier) {
+    try {
+      const queryStringParameters = {
+        supplier: supplier,
+      };
+      storeGetDiffsStatus[storename] = "Waiting for store " + storename;
 
-    console.log("selected stores: ", selectedStores);
+      const response = await invokeLambdaDirectly(
+        "GET",
+        "/changes/{storename+}",
+        "/changes/" + storename,
+        { storename: storename },
+        queryStringParameters,
+        ""
+      );
+      console.log(response);
 
-    if (selectedStores.length !== 0) {
-      var message = "Applying changes to stores: ";
-      for (var i in selectedStores) {
-        message = message + selectedStores[i] + ", ";
+      const message = checkServerResponse(response);
+      if (message !== "") {
+        console.log("Error: ", message);
+        storeGetDiffsStatus[storename] =
+          "Failed gettomg differences for store " + storename + ": " + message;
+        setStoreDifferences[storename] = "";
+      } else {
+        const payload = JSON.parse(response.Payload);
+        const body = JSON.parse(payload.body);
+        console.log("body:", body);
+        if (body.length === 0) {
+          storeGetDiffsStatus[storename] =
+            "No differences found for store " + storename;
+        } else {
+          storeGetDiffsStatus[storename] =
+            "Completed  getting differences for store " + storename;
+        }
+
+        // prepare to display - add to each line also a 'store' attribute
+        const storeDiffs = body.map((line) => ({
+          ...line,
+          Store: storename,
+        }));
+
+        storeDifferences[storename] = storeDiffs;
       }
-      message = message + "...";
+      return response;
+    } catch (error) {
+      console.error(error);
+      const response = error;
+      storeGetDiffsStatus[storename] =
+        "Problems while getting differences for store " +
+        storename +
+        ": " +
+        error;
+      storeDifferences[storename] = [];
+      return response;
+    }
+  }
 
-      setStatus(message);
+  const viewDiffsMultipleStores = () => {
+    console.log(
+      "in viewDiffsMultipleStores. selected stores: ",
+      selectedStores
+    );
+    //setChanges([]); // todo check if needed
+    if (selectedStores.length !== 0) {
+      setStatus(
+        "Retrieving main db differences for stores: " +
+          setMultipleStatus(selectedStores)
+      );
 
-      setStoreUpdateStatus([]);
-      setStoreUpdateResults([]);
-      setChanges([]);
-      for (i in selectedStores) {
-        var storename = selectedStores[i];
+      //setStoreUpdateStatus([]);
+      //setStoreUpdateResults([]);
 
-        applyOneStore(storename, inputs.supplier).then((res) => {
-          console.log(res);
-
-          const message = checkServerResponse(res);
-          if (message !== "") {
-            console.log("Error: ", message);
-            setStatusMultipleStores();
-            setResultsMultipleStoreUpdates();
-          } else {
-            setStatusMultipleStores();
-            setResultsMultipleStoreUpdates();
-            //type="results";
-          }
+      for (var i in selectedStores) {
+        viewDiffsSingleStore(selectedStores[i], inputs.supplier).then((res) => {
+          //console.log(res);
+          setDiffStatusMultipleStores();
+          setDiffsMultipleStores();
         });
       }
     } else {
       setStatus("No stores selected");
-      setChanges([]);
+    }
+  };
+
+  const applyToStores = () => {
+    console.log("in applytoStores. selected stores: ", selectedStores);
+    setChanges([]);
+    if (selectedStores.length !== 0) {
+      var message =
+        "Applying changes to stores: " + setMultipleStatus(selectedStores);
+
+      setStatus(message);
+      setStoreUpdateStatus([]);
+      setStoreUpdateResults([]);
+
+      for (var i in selectedStores) {
+        applyOneStore(selectedStores[i], inputs.supplier).then((res) => {
+          //console.log(res);
+          setStatusMultipleStores();
+          setResultsMultipleStoreUpdates();
+        });
+      }
+    } else {
+      setStatus("No stores selected");
     }
   };
 
@@ -202,6 +274,13 @@ const UpdateFromDb = () => {
               ))}
           </SelectField>
           <CheckboxSelectStores></CheckboxSelectStores>
+          <Button
+            key="viewdiffs"
+            name="view_diffs"
+            onClick={viewDiffsMultipleStores}
+          >
+            View differences from DB
+          </Button>
           <Button key="applydiffs" name="apply_changes" onClick={applyToStores}>
             Apply differences from DB
           </Button>

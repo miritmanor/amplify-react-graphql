@@ -5,6 +5,7 @@ import { getS3FileContents } from "../utils/lambdaAccess.js";
 import { fetchStores } from "../utils/lambdaAccess.js";
 import { OrderedDictionaryArrayTable } from "../components/OrderedDictionaryArrayTable.jsx";
 import { Status, setMultipleStatus } from "../utils/status.js";
+import { MultipleLists } from "../utils/lists.js";
 import {
   Flex,
   Heading,
@@ -61,6 +62,7 @@ const UpdateFromFile = () => {
   };
 
   const cleanup = () => {
+    // todo arrange, maybe remove set status from here, and maybe not clear the selected stores and file contents immediately.
     setStatus("");
     setFileContent([]);
     setChanges([]);
@@ -155,11 +157,11 @@ const UpdateFromFile = () => {
   };
 
   const setResultsMultipleStoreUpdates = () => {
-    var resultList = [];
-    for (var i in storeUpdateResults) {
-      resultList = resultList.concat(storeUpdateResults[i]);
-    }
-    setChanges(resultList);
+    //var resultList = [];
+    //for (var i in storeUpdateResults) {
+    //resultList = resultList.concat(storeUpdateResults[i]);
+    //}
+    setChanges(MultipleLists(storeUpdateResults));
   };
 
   const applyValuesOneStore = async (storename, values) => {

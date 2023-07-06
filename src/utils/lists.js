@@ -1,5 +1,5 @@
 export const MultipleLists = (list) => {
-  var resultList: = [];
+  var resultList = [];
   for (var i in list) {
     resultList = resultList.concat(list[i]);
   }

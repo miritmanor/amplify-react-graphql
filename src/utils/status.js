@@ -18,7 +18,7 @@ export const setMultipleStatus = (statusList) => {
     for (var i in statusList) {
       message = message + statusList[i] + ", ";
     }
-    return(message);
+    return(message.slice(0,-2));   // remove last comma and space
   };
 
 
