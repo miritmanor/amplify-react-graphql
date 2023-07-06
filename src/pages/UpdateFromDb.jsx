@@ -5,7 +5,7 @@ import {
 } from "../utils/lambdaAccess.js";
 import { fetchStores, fetchSuppliers } from "../utils/lambdaAccess.js";
 import { OrderedDictionaryArrayTable } from "../components/OrderedDictionaryArrayTable.jsx";
-import { Status, setMultipleStatus } from "../utils/Status.js";
+import { Status, setMultipleStatus } from "../utils/status.js";
 import {
   Button,
   SelectField,

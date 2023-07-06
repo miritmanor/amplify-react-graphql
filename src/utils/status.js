@@ -11,7 +11,7 @@ export const Status = ({status}) => {
          {s} 
         </>
     );
-}
+} 
 
 export const setMultipleStatus = (statusList) => {
     var message = "";

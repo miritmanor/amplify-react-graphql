@@ -16,7 +16,7 @@ import {
   View,
   Heading,
 } from "@aws-amplify/ui-react";
-import { Status } from "../utils/Status.js";
+import { Status } from "../utils/status.js";
 import { isInSearchTerm } from "../utils/search.js";
 
 const StoreProducts = () => {
