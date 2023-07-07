@@ -211,19 +211,10 @@ const UpdateFromFile = () => {
     //console.log("selected stores: ",selectedStores);
 
     if (stores.length !== 0) {
-      var message = "Applying changes to stores: ";
-      for (var i in stores) {
-        message = message + stores[i] + ", ";
-      }
-      message = message + "...";
-
       cleanup();
-      setStatus(message);
+      setStatus("Applying changes to stores: " + setMultipleStatus(stores));
 
-      //setStoreUpdateStatus([]);
-      //setStoreUpdateResults([]);
-      //setChanges([]);
-      for (i in stores) {
+      for (var i in stores) {
         applyValuesOneStore(stores[i], values).then((res) => {
           setStatusMultipleStores();
           setResultsMultipleStoreUpdates();

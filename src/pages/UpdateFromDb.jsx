@@ -46,7 +46,7 @@ const UpdateFromDb = () => {
   };
 
   const setDiffStatusMultipleStores = () => {
-    setStatus(setMultipleStatus(setStoreGetDiffsStatus));
+    setStatus(setMultipleStatus(storeGetDiffsStatus));
   };
 
   const setDiffsMultipleStores = () => {
@@ -54,6 +54,7 @@ const UpdateFromDb = () => {
   };
 
   async function applyOneStore(storename, supplier) {
+    console.log("applyOneStore", storename, supplier);
     try {
       const queryStringParameters = {
         supplier: supplier,
@@ -108,6 +109,7 @@ const UpdateFromDb = () => {
   }
 
   async function viewDiffsSingleStore(storename, supplier) {
+    console.log("viewDiffsSingleStore", storename, supplier);
     try {
       const queryStringParameters = {
         supplier: supplier,
@@ -122,13 +124,13 @@ const UpdateFromDb = () => {
         queryStringParameters,
         ""
       );
-      console.log(response);
+      console.log("response from lambda: ", response);
 
       const message = checkServerResponse(response);
       if (message !== "") {
         console.log("Error: ", message);
         storeGetDiffsStatus[storename] =
-          "Failed gettomg differences for store " + storename + ": " + message;
+          "Failed getting differences for store " + storename + ": " + message;
         setStoreDifferences[storename] = "";
       } else {
         const payload = JSON.parse(response.Payload);
@@ -178,6 +180,7 @@ const UpdateFromDb = () => {
 
       //setStoreUpdateStatus([]);
       //setStoreUpdateResults([]);
+      setStoreGetDiffsStatus([]);
 
       for (var i in selectedStores) {
         viewDiffsSingleStore(selectedStores[i], inputs.supplier).then((res) => {
