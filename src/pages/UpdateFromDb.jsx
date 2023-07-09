@@ -18,18 +18,22 @@ import {
 } from "@aws-amplify/ui-react";
 
 const UpdateFromDb = () => {
-  const [changes, setChanges] = useState([]);
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState(""); // status string to display
+
   const [inputs, setInputs] = useState({});
-  const [stores, setStores] = useState([]);
-  const [suppliers, setSuppliers] = useState([]);
-  const [selectedStores, setSelectedStores] = useState([]);
 
-  const [storeUpdateStatus, setStoreUpdateStatus] = useState([]);
-  const [storeUpdateResults, setStoreUpdateResults] = useState([]);
+  const [stores, setStores] = useState([]); // stores for selection
+  const [selectedStores, setSelectedStores] = useState([]); // selected stores
+  const [suppliers, setSuppliers] = useState([]); // suppliers for selection
 
+  const [results, setResults] = useState([]); // the list to display with results - either differences to view or update results
+
+  const [storeStatus, setStoreStatus] = useState([]); // list of status strings for each store
+  const [storeResults, setStoreResults] = useState([]); // list of results for each store
+  /*
   const [storeGetDiffsStatus, setStoreGetDiffsStatus] = useState([]);
   const [storeDifferences, setStoreDifferences] = useState([]);
+  */
 
   useEffect(() => {
     //Runs only on the first render
@@ -38,20 +42,21 @@ const UpdateFromDb = () => {
   }, []);
 
   const setStatusMultipleStores = () => {
-    setStatus(setMultipleStatus(storeUpdateStatus));
+    setStatus(setMultipleStatus(storeStatus));
   };
 
-  const setResultsMultipleStoreUpdates = () => {
-    setChanges(MultipleLists(storeUpdateResults));
+  const setResultsMultipleStores = () => {
+    setResults(MultipleLists(storeResults));
   };
-
+  /*
   const setDiffStatusMultipleStores = () => {
     setStatus(setMultipleStatus(storeGetDiffsStatus));
   };
 
   const setDiffsMultipleStores = () => {
-    setChanges(MultipleLists(storeDifferences));
+    setResults(MultipleLists(storeDifferences));
   };
+  */
 
   async function applyOneStore(storename, supplier) {
     console.log("applyOneStore", storename, supplier);
@@ -59,7 +64,7 @@ const UpdateFromDb = () => {
       const queryStringParameters = {
         supplier: supplier,
       };
-      storeUpdateStatus[storename] = "Waiting for store " + storename;
+      storeStatus[storename] = "Waiting for store " + storename;
 
       const response = await invokeLambdaDirectly(
         "PUT",
@@ -74,36 +79,33 @@ const UpdateFromDb = () => {
       const message = checkServerResponse(response);
       if (message !== "") {
         console.log("Error: ", message);
-        storeUpdateStatus[storename] =
+        storeStatus[storename] =
           "Failed applying to store " + storename + ": " + message;
-        storeUpdateResults[storename] = "";
+        storeResults[storename] = "";
       } else {
         const payload = JSON.parse(response.Payload);
         const body = JSON.parse(payload.body);
         console.log("body:", body);
         if (body.length === 0) {
-          storeUpdateStatus[storename] =
+          storeStatus[storename] =
             "No differences found for store " + storename;
         } else {
-          storeUpdateStatus[storename] =
-            "Completed applying to store " + storename;
+          storeStatus[storename] = "Completed applying to store " + storename;
         }
 
         // prepare to display - add to each line also a 'store' attribute
-        const storeResults = body.map((line) => ({
+        storeResults[storename] = body.map((line) => ({
           ...line,
           Store: storename,
         }));
-
-        storeUpdateResults[storename] = storeResults;
       }
       return response;
     } catch (error) {
       console.error(error);
       const response = error;
-      storeUpdateStatus[storename] =
+      storeStatus[storename] =
         "Problems while applying to store " + storename + ": " + error;
-      storeUpdateResults[storename] = [];
+      storeResults[storename] = [];
       return response;
     }
   }
@@ -114,7 +116,7 @@ const UpdateFromDb = () => {
       const queryStringParameters = {
         supplier: supplier,
       };
-      storeGetDiffsStatus[storename] = "Waiting for store " + storename;
+      storeStatus[storename] = "Waiting for store " + storename;
 
       const response = await invokeLambdaDirectly(
         "GET",
@@ -129,40 +131,37 @@ const UpdateFromDb = () => {
       const message = checkServerResponse(response);
       if (message !== "") {
         console.log("Error: ", message);
-        storeGetDiffsStatus[storename] =
+        storeStatus[storename] =
           "Failed getting differences for store " + storename + ": " + message;
-        setStoreDifferences[storename] = "";
+        storeResults[storename] = "";
       } else {
         const payload = JSON.parse(response.Payload);
         const body = JSON.parse(payload.body);
         console.log("body:", body);
         if (body.length === 0) {
-          storeGetDiffsStatus[storename] =
+          storeStatus[storename] =
             "No differences found for store " + storename;
         } else {
-          storeGetDiffsStatus[storename] =
+          storeStatus[storename] =
             "Completed  getting differences for store " + storename;
         }
 
         // prepare to display - add to each line also a 'store' attribute
-        const storeDiffs = body.map((line) => ({
+        storeResults[storename] = body.map((line) => ({
           ...line,
           Store: storename,
         }));
-
-        storeDifferences[storename] = storeDiffs;
       }
       return response;
     } catch (error) {
       console.error(error);
-      const response = error;
-      storeGetDiffsStatus[storename] =
+      storeStatus[storename] =
         "Problems while getting differences for store " +
         storename +
         ": " +
         error;
-      storeDifferences[storename] = [];
-      return response;
+      storeResults[storename] = [];
+      return error;
     }
   }
 
@@ -171,22 +170,22 @@ const UpdateFromDb = () => {
       "in viewDiffsMultipleStores. selected stores: ",
       selectedStores
     );
-    //setChanges([]); // todo check if needed
+    setResults([]);
     if (selectedStores.length !== 0) {
       setStatus(
         "Retrieving main db differences for stores: " +
           setMultipleStatus(selectedStores)
       );
 
-      //setStoreUpdateStatus([]);
-      //setStoreUpdateResults([]);
-      setStoreGetDiffsStatus([]);
+      //cleanup previous results for all stores
+      setStoreStatus([]);
+      setStoreResults([]);
 
       for (var i in selectedStores) {
         viewDiffsSingleStore(selectedStores[i], inputs.supplier).then((res) => {
           //console.log(res);
-          setDiffStatusMultipleStores();
-          setDiffsMultipleStores();
+          setStatusMultipleStores();
+          setResultsMultipleStores();
         });
       }
     } else {
@@ -196,20 +195,20 @@ const UpdateFromDb = () => {
 
   const applyToStores = () => {
     console.log("in applytoStores. selected stores: ", selectedStores);
-    setChanges([]);
+    setResults([]);
     if (selectedStores.length !== 0) {
-      var message =
-        "Applying changes to stores: " + setMultipleStatus(selectedStores);
+      setStatus(
+        "Applying changes to stores: " + setMultipleStatus(selectedStores)
+      );
 
-      setStatus(message);
-      setStoreUpdateStatus([]);
-      setStoreUpdateResults([]);
+      setStoreStatus([]);
+      setStoreResults([]);
 
       for (var i in selectedStores) {
         applyOneStore(selectedStores[i], inputs.supplier).then((res) => {
           //console.log(res);
           setStatusMultipleStores();
-          setResultsMultipleStoreUpdates();
+          setResultsMultipleStores();
         });
       }
     } else {
@@ -256,7 +255,7 @@ const UpdateFromDb = () => {
       const value = event.target.value;
       setInputs((values) => ({ ...values, [name]: value }));
       setStatus("");
-      setChanges([]);
+      setResults([]);
     };
 
     return (
@@ -293,12 +292,12 @@ const UpdateFromDb = () => {
   }
 
   function DisplayContent() {
-    if (changes.length !== 0) {
+    if (results.length !== 0) {
       const columns = ["SKU", "Name", "Supplier", "Result", "Store", "Details"];
       return (
         <>
           <Heading level={4}>Results</Heading>
-          <OrderedDictionaryArrayTable items={changes} columns={columns} />
+          <OrderedDictionaryArrayTable items={results} columns={columns} />
         </>
       );
     } else {
@@ -306,7 +305,7 @@ const UpdateFromDb = () => {
     }
   }
 
-  console.log("changes:", changes);
+  console.log("changes:", results);
   return (
     <div style={{ marginTop: "30px" }}>
       <h2>Select stores to apply changes</h2>

@@ -63,7 +63,7 @@ const UpdateFromFile = () => {
 
   const cleanup = () => {
     // todo arrange, maybe remove set status from here, and maybe not clear the selected stores and file contents immediately.
-    setStatus("");
+    //setStatus("");
     setFileContent([]);
     setChanges([]);
     setSelectedStores([]);
@@ -211,7 +211,10 @@ const UpdateFromFile = () => {
     //console.log("selected stores: ",selectedStores);
 
     if (stores.length !== 0) {
-      cleanup();
+      //cleanup();
+      setStoreUpdateStatus([]);
+      setStoreUpdateResults([]);
+      setChanges([]);
       setStatus("Applying changes to stores: " + setMultipleStatus(stores));
 
       for (var i in stores) {
