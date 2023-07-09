@@ -137,6 +137,7 @@ const COGNITO_IDP=process.env.REACT_APP_COGNITO_IDP;
       }
     }
     catch (err) {
+      console.log("Exception: ",err);
       return(err.message);
     }
 
@@ -251,7 +252,11 @@ export async function invokeLambdaDirectly(httpMethod,resource,path,pathParamete
        region: REGION, 
        apiVersion: '2015-03-31',
        //credentials: Auth.essentialCredentials(credentials)
-       credentials: credentials
+       credentials: credentials,
+       maxRetries : 0,               // do not retry failed requests
+        httpOptions : {               // timeout after 15 minutes
+            timeout : 900000
+        }
      });
    
     const params = {
