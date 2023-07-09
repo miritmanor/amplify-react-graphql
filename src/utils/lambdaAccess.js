@@ -234,6 +234,7 @@ const COGNITO_IDP=process.env.REACT_APP_COGNITO_IDP;
 export async function invokeLambdaDirectly(httpMethod,resource,path,pathParameters,queryStringParameters,body) {
 
     AWS.config.update({region:REGION});
+    AWS.config.update({httpOptions: {timeout: 900000}});
     console.log("LAMBDA_NAME:",LAMBDA_NAME);
     console.log("IDENTITY_POOL_ID:",IDENTITY_POOL_ID);
     console.log("COGNITO_IDP:",COGNITO_IDP);
@@ -287,6 +288,7 @@ export async function invokeLambdaDirectly(httpMethod,resource,path,pathParamete
     } catch (error) {
         console.error("Failed to invoke lambda");
         console.error(error);
+        return ("Failed to invoke lambda" + error.message); 
     }
   }
 
