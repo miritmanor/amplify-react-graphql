@@ -121,6 +121,10 @@ const COGNITO_IDP=process.env.REACT_APP_COGNITO_IDP;
         JSON.stringify(values)
       );
       //console.log(res);
+      if (typeof res === 'string') {
+        console.log("error: ",res);
+        return("Failed to update store " + storename + ": " + res);
+      }
       if (res.StatusCode === 200) {
         console.log("success: ",res);
         const result = JSON.parse(res.Payload);
@@ -271,6 +275,7 @@ export async function invokeLambdaDirectly(httpMethod,resource,path,pathParamete
         console.log(response);
         return(response);
     } catch (error) {
+        console.error("Failed to invoke lambda");
         console.error(error);
     }
   }
