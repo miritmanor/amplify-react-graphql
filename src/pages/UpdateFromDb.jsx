@@ -6,7 +6,7 @@ import {
 import { fetchStores, fetchSuppliers } from "../utils/lambdaAccess.js";
 import { OrderedDictionaryArrayTable } from "../components/OrderedDictionaryArrayTable.jsx";
 import { Status, setMultipleStatus } from "../utils/status.js";
-import { MultipleLists } from "../utils/lists.js";
+import { MultipleLists, changesList } from "../utils/lists.js";
 import {
   Button,
   SelectField,
@@ -46,6 +46,8 @@ const UpdateFromDb = () => {
   };
 
   const setResultsMultipleStores = () => {
+    //setChanges(changesList(body, "Details"));
+    //setResults(MultipleLists(changesList(storeResults, "Details")));
     setResults(MultipleLists(storeResults));
   };
   /*
@@ -147,7 +149,9 @@ const UpdateFromDb = () => {
         }
 
         // prepare to display - add to each line also a 'store' attribute
-        storeResults[storename] = body.map((line) => ({
+        const diffList = changesList(body, "Details");
+        console.log("diffList:", diffList);
+        storeResults[storename] = diffList.map((line) => ({
           ...line,
           Store: storename,
         }));
@@ -293,7 +297,18 @@ const UpdateFromDb = () => {
 
   function DisplayContent() {
     if (results.length !== 0) {
-      const columns = ["SKU", "Name", "Supplier", "Result", "Store", "Details"];
+      //const columns = ["SKU", "Name", "Supplier", "Result", "Store", "Details"];
+      const columns = [
+        "SKU",
+        "Name",
+        "Supplier",
+        "Result",
+        "Store",
+        "Field name",
+        "Value in main DB",
+        "Value in store",
+      ];
+
       return (
         <>
           <Heading level={4}>Results</Heading>

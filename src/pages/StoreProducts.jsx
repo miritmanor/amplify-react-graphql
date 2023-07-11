@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { changesList } from "../utils/lists.js";
 
 import {
   fetchStores,
@@ -113,8 +114,8 @@ const StoreProducts = () => {
               setShowChanges(true);
             }
 
-            //type="differences";
-            setChanges(body);
+            //setChanges(body);
+            setChanges(changesList(body, "Details"));
           }
         } catch (err) {
           console.log(err);
@@ -352,7 +353,15 @@ const StoreProducts = () => {
       "supplier_id_in_store",
     ];
     const resultColumns = ["sku", "result"];
-    const changeColumns = ["SKU", "Name", "Supplier", "Details"];
+    //const changeColumns = ["SKU", "Name", "Supplier", "Details"];
+    const changeColumns = [
+      "SKU",
+      "Name",
+      "Supplier",
+      "Field name",
+      "Value in main DB",
+      "Value in store",
+    ];
     const SyncResultsColumns = ["SKU", "Name", "Supplier", "Result", "Details"];
 
     return (

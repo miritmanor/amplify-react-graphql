@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import "./tabs.css";
 
 const Tabs = ({ tabs }) => {
@@ -14,7 +14,7 @@ const Tabs = ({ tabs }) => {
         {tabs.map((tab, index) => (
           <li
             key={index}
-            className={activeTab === index ? 'active' : ''}
+            className={activeTab === index ? "active" : ""}
             onClick={() => handleClick(index)}
           >
             {tab.title}
@@ -22,11 +22,14 @@ const Tabs = ({ tabs }) => {
         ))}
       </ul>
       <div>
-        {tabs.map((tab,index) => (
-          <div key={index} style={{ display: activeTab === index ? 'block' : 'none' }}>
+        {tabs.map((tab, index) => (
+          <div
+            key={index}
+            style={{ display: activeTab === index ? "block" : "none" }}
+          >
             {tab.content}
-        </div>
-        ))};
+          </div>
+        ))}
       </div>
     </div>
   );
