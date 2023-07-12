@@ -26,6 +26,7 @@ const UpdateFromFile = () => {
   const [status, setStatus] = useState("");
   const [storeUpdateStatus, setStoreUpdateStatus] = useState([]);
   const [storeUpdateResults, setStoreUpdateResults] = useState([]);
+  const parallelExecution = false;
 
   const resultsColumns = [
     "SKU",
@@ -96,16 +97,20 @@ const UpdateFromFile = () => {
       const tempfilename = Date.now() + "-" + selectedFile.name;
       //console.log("tempfilename: ", tempfilename);
       //setFilename(tempfilename);
-      await Storage.put(tempfilename, selectedFile, {
+      const result = await Storage.put(tempfilename, selectedFile, {
         //contentType: "image/png", // contentType is optional
         progressCallback(progress) {
           console.log(`Upload status: ${progress.loaded}/${progress.total}`);
           if (progress.loaded === progress.total) {
-            setStatus("File uploaded. Retrieving file contents");
-            getS3FileContents(tempfilename, analyzeGetResults);
+            //setStatus("File uploaded. Retrieving file contents");
+            //getS3FileContents(tempfilename, analyzeGetResults);
+            console.log("file " + tempfilename + " uploaded");
           }
         },
       });
+      console.log("result: ", result.key, result.key);
+      setStatus("File uploaded. Retrieving file contents");
+      getS3FileContents(tempfilename, analyzeGetResults);
       //console.log("file " + tempfilename + " uploaded");
       //console.log(rc);
 
@@ -217,15 +222,39 @@ const UpdateFromFile = () => {
       setChanges([]);
       setStatus("Applying changes to stores: " + setMultipleStatus(stores));
 
-      for (var i in stores) {
-        applyValuesOneStore(stores[i], values).then((res) => {
-          setStatusMultipleStores();
-          setResultsMultipleStoreUpdates();
-        });
+      if (parallelExecution) {
+        updateStoresParallel(stores, values);
+      } else {
+        updateStoresSequential(stores, values);
       }
     } else {
       setStatus("No stores selected");
       setChanges([]);
+    }
+  };
+
+  const updateStoresSequential = async (selectedStores, values) => {
+    // execute sequentially
+    for (var i in selectedStores) {
+      storeUpdateStatus[selectedStores[i]] =
+        "Store " + selectedStores[i] + " pending";
+    }
+    for (i in selectedStores) {
+      await applyValuesOneStore(selectedStores[i], values);
+      //console.log(res);
+      setStatusMultipleStores();
+      setResultsMultipleStoreUpdates();
+    }
+  };
+
+  const updateStoresParallel = (selectedStores, values) => {
+    // execute in parallel
+    for (var i in selectedStores) {
+      applyValuesOneStore(selectedStores[i], values).then((res) => {
+        //console.log(res);
+        setStatusMultipleStores();
+        setResultsMultipleStoreUpdates();
+      });
     }
   };
 

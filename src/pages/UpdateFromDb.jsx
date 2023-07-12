@@ -34,6 +34,7 @@ const UpdateFromDb = () => {
   const [storeGetDiffsStatus, setStoreGetDiffsStatus] = useState([]);
   const [storeDifferences, setStoreDifferences] = useState([]);
   */
+  const parallelExecution = false; // if true, apply to all stores in parallel, otherwise apply to one store at a time
 
   useEffect(() => {
     //Runs only on the first render
@@ -208,15 +209,39 @@ const UpdateFromDb = () => {
       setStoreStatus([]);
       setStoreResults([]);
 
-      for (var i in selectedStores) {
-        applyOneStore(selectedStores[i], inputs.supplier).then((res) => {
-          //console.log(res);
-          setStatusMultipleStores();
-          setResultsMultipleStores();
-        });
+      if (parallelExecution) {
+        // execute simultaneously
+        updateStoresParallel(selectedStores, inputs.supplier);
+      } else {
+        updateStoresSequential(selectedStores, inputs.supplier);
       }
     } else {
       setStatus("No stores selected");
+    }
+  };
+
+  const updateStoresSequential = async (selectedStores, supplier) => {
+    for (var i in selectedStores) {
+      storeStatus[selectedStores[i]] =
+        "Store " + selectedStores[i] + " pending";
+    }
+    // execute sequentially
+    for (i in selectedStores) {
+      await applyOneStore(selectedStores[i], supplier);
+      //console.log(res);
+      setStatusMultipleStores();
+      setResultsMultipleStores();
+    }
+  };
+
+  const updateStoresParallel = (selectedStores, supplier) => {
+    // execute in parallel
+    for (var i in selectedStores) {
+      applyOneStore(selectedStores[i], supplier).then((res) => {
+        //console.log(res);
+        setStatusMultipleStores();
+        setResultsMultipleStores();
+      });
     }
   };
 
