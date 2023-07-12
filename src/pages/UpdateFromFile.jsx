@@ -235,6 +235,7 @@ const UpdateFromFile = () => {
 
   const updateStoresSequential = async (selectedStores, values) => {
     // execute sequentially
+    console.log("in updateStoresSequential");
     for (var i in selectedStores) {
       storeUpdateStatus[selectedStores[i]] =
         "Store " + selectedStores[i] + " pending";
@@ -249,6 +250,7 @@ const UpdateFromFile = () => {
 
   const updateStoresParallel = (selectedStores, values) => {
     // execute in parallel
+    console.log("in updateStoresParallel");
     for (var i in selectedStores) {
       applyValuesOneStore(selectedStores[i], values).then((res) => {
         //console.log(res);
