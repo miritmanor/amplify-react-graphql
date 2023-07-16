@@ -28,14 +28,19 @@ export const changesList = (list,changesFieldName) => {
     var cleanString = escapedJsonString.replace(/'/g,'"').replaceAll("\\xa0"," ").replaceAll("*גר","גר'");
     //var newString=cleanString.replaceAll("*גר","גר'");
     console.log("cleanString:",cleanString );
-    const jsonDetails = JSON.parse(cleanString);
-    for (var detail in jsonDetails) {
-      console.log("detail:",detail);
-      newDict={...newDict,'Field name': detail}; 
-      newDict={...newDict,'Value in main DB': jsonDetails[detail]['main DB']};
-      newDict={...newDict,'Value in store': jsonDetails[detail]['store']};
-      //console.log("newDict:",newDict);
-      newList.push(newDict);
+    try {
+      const jsonDetails = JSON.parse(cleanString);
+      for (var detail in jsonDetails) {
+        console.log("detail:",detail);
+        newDict={...newDict,'Field name': detail}; 
+        newDict={...newDict,'Value in main DB': jsonDetails[detail]['main DB']};
+        newDict={...newDict,'Value in store': jsonDetails[detail]['store']};
+        //console.log("newDict:",newDict);
+        newList.push(newDict);
+        newDict['Details']='';
+      }
+    } catch (e) {
+      console.log("error in JSON.parse:",e);
     }
   }
   return newList;

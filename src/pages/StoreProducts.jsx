@@ -361,6 +361,7 @@ const StoreProducts = () => {
       "Field name",
       "Value in main DB",
       "Value in store",
+      "Details",
     ];
     const SyncResultsColumns = ["SKU", "Name", "Supplier", "Result", "Details"];
 

@@ -332,6 +332,7 @@ const UpdateFromDb = () => {
         "Field name",
         "Value in main DB",
         "Value in store",
+        "Details",
       ];
 
       return (
