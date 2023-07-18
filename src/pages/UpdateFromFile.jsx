@@ -43,6 +43,19 @@ const UpdateFromFile = () => {
   }, []);
 
   useEffect(() => {
+    // add main DB to list of stores
+    console.log("in useEffect stores");
+    console.log("stores: ", stores);
+    const mainDbIncluded = stores.find((item) => item.StoreName === "Main DB");
+    if (!mainDbIncluded) {
+      console.log("Main DB not in stores");
+      setStores((stores) => [...stores, { StoreName: "Main DB" }]);
+    } else {
+      console.log("Main DB already in stores");
+    }
+  }, [stores]);
+
+  useEffect(() => {
     //console.log("fileContent: ", fileContent);
     console.log("new file content available. size is ", fileContent.length);
     setStatus("");

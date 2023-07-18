@@ -112,7 +112,7 @@ const COGNITO_IDP=process.env.REACT_APP_COGNITO_IDP;
   }
 
   export async function updateStoreFromList(storename,values) {
-    var commizurl = BASEURL + 'changes/' + storename;
+    var commizurl = encodeURIComponent(BASEURL + 'changes/' + storename);
 
     console.log("In updateStoreFromList ",commizurl);
     //console.log("values: ",values);
