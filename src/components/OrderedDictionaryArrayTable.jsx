@@ -1,10 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 export function OrderedDictionaryArrayTable(props) {
   // eslint-disable-next-line
   const [selectedLine, setSelectedLine] = useState(null);
   const dictionaries = props.items;
   const columnOrder = props.columns;
+  const onSelectionChange = props.onSelectionChange;
+  var selectionEnabled = false;
+  if (props.onSelectionChange) {
+    selectionEnabled = true;
+  }
+  const [selectAll, setSelectAll] = useState(false);
+
+  const [selectedRows, setSelectedRows] = useState([]);
 
   // perform action upon selecting a row in the table
   const handleRowClick = (event) => {
@@ -18,6 +26,40 @@ export function OrderedDictionaryArrayTable(props) {
     }
     //const sku = row.cells[0].innerText;
     //const change = {SKU:sku,Name:name,Supplier:supplier,Details:details,Store:store,Result:result};
+  };
+
+  useEffect(() => {
+    // Call the onSelectionChange callback whenever the selectedRows state changes.
+    // This ensures the calling component receives the updated selected rows.
+    if (selectionEnabled) {
+      onSelectionChange(selectedRows);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedRows]);
+
+  useEffect(() => {
+    if (selectAll) {
+      setSelectedRows(dictionaries.map((item, index) => index));
+    } else {
+      setSelectedRows([]);
+    }
+  }, [selectAll, dictionaries]);
+
+  const handleCheckboxChange = (event, id) => {
+    //console.log("handleCheckboxChange. id:", id);
+    //console.log("line: ", dictionaries[id]);
+    const isChecked = event.target.checked;
+    if (isChecked) {
+      setSelectedRows((prevSelectedRows) => [...prevSelectedRows, id]);
+    } else {
+      setSelectedRows((prevSelectedRows) =>
+        prevSelectedRows.filter((rowId) => rowId !== id)
+      );
+    }
+  };
+
+  const handleToggleSelectAll = () => {
+    setSelectAll((prevSelectAll) => !prevSelectAll);
   };
 
   if (dictionaries && dictionaries.length === 0) {
@@ -34,6 +76,15 @@ export function OrderedDictionaryArrayTable(props) {
 
     return (
       <tr key={index} onClick={handleRowClick}>
+        {selectionEnabled && (
+          <td>
+            <input
+              type="checkbox"
+              checked={selectedRows.includes(index)}
+              onChange={(e) => handleCheckboxChange(e, index)}
+            />
+          </td>
+        )}
         {cells}
       </tr>
     );
@@ -48,6 +99,15 @@ export function OrderedDictionaryArrayTable(props) {
     <table>
       <thead>
         <tr>
+          {selectionEnabled && (
+            <th>
+              <input
+                type="checkbox"
+                checked={selectAll}
+                onChange={handleToggleSelectAll}
+              />
+            </th>
+          )}
           {columnOrder.map((key) => (
             <th key={key}>{key}</th>
           ))}

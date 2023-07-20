@@ -16,6 +16,16 @@ import { Flex, Heading, View, Button, TextField } from "@aws-amplify/ui-react";
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [selectedProducts, setSelectedProducts] = useState([]);
+
+  const onSelectionChange = (selectedRows) => {
+    //console.log("selectedRows:", selectedRows);
+    //setSelectedProducts(selectedRows);
+    setSelectedProducts(
+      products.filter((product, index) => selectedRows.includes(index))
+    );
+    //console.log("selectedProducts:", selectedProducts);
+  };
   const [searchTerm, setSearchTerm] = useState("");
   const [productSKU, setProductSKU] = useState("");
   const [inputs, setInputs] = useState({});
@@ -256,6 +266,16 @@ const Products = () => {
           {" "}
           Download as CSV
         </CSVLink>
+        <CSVLink
+          data={selectedProducts}
+          headers={csvcolumns}
+          filename={"selected-main-database-products.csv"}
+          enclosingCharacter={``}
+          className="amplify-button amplify-field-group__control"
+        >
+          {" "}
+          Download selected as CSV
+        </CSVLink>
         <Button
           key="showUpdateButton"
           name="show_update_button"
@@ -361,7 +381,11 @@ const Products = () => {
         Product list
       </Heading>
 
-      <OrderedDictionaryArrayTable items={filteredProducts} columns={columns} />
+      <OrderedDictionaryArrayTable
+        items={filteredProducts}
+        columns={columns}
+        onSelectionChange={onSelectionChange}
+      />
     </View>
   );
 };
