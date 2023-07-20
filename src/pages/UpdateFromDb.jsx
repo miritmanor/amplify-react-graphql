@@ -27,6 +27,11 @@ const UpdateFromDb = () => {
   const [suppliers, setSuppliers] = useState([]); // suppliers for selection
 
   const [results, setResults] = useState([]); // the list to display with results - either differences to view or update results
+  const [selectedResults, setSelectedResults] = useState([]);
+
+  const onSelectionChange = (selectedRows) => {
+    setSelectedResults(selectedRows);
+  };
 
   const [storeStatus, setStoreStatus] = useState([]); // list of status strings for each store
   const [storeResults, setStoreResults] = useState([]); // list of results for each store
