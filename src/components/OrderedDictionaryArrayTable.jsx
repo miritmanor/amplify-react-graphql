@@ -1,65 +1,41 @@
-import React, { useState, useEffect } from "react";
-
 export function OrderedDictionaryArrayTable(props) {
   // eslint-disable-next-line
-  const [selectedLine, setSelectedLine] = useState(null);
+  //const [selectedLine, setSelectedLine] = useState(null);
   const dictionaries = props.items;
   const columnOrder = props.columns;
   const onSelectionChange = props.onSelectionChange;
+  const onSelectAll = props.onSelectAll;
+  const isChecked = props.isChecked;
+  const isSelectAll = props.isSelectAll;
+
   var selectionEnabled = false;
   if (props.onSelectionChange) {
+    console.log("selection enabled");
     selectionEnabled = true;
   }
-  const [selectAll, setSelectAll] = useState(false);
+  //const [selectAll, setSelectAll] = useState(false);
 
-  const [selectedRows, setSelectedRows] = useState([]);
+  //const [selectedRows, setSelectedRows] = useState([]);
+  //const selectedRows=[];
 
   // perform action upon selecting a row in the table
+  /*
   const handleRowClick = (event) => {
     const row = event.target.parentNode;
-    setSelectedLine(event);
-    console.log("row:", row);
-    // get a function from props that will handle the click
     const action = props.action;
     if (action) {
       action(row);
     }
-    //const sku = row.cells[0].innerText;
-    //const change = {SKU:sku,Name:name,Supplier:supplier,Details:details,Store:store,Result:result};
   };
-
-  useEffect(() => {
-    // Call the onSelectionChange callback whenever the selectedRows state changes.
-    // This ensures the calling component receives the updated selected rows.
-    if (selectionEnabled) {
-      onSelectionChange(selectedRows);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedRows]);
-
-  useEffect(() => {
-    if (selectAll) {
-      setSelectedRows(dictionaries.map((item, index) => index));
-    } else {
-      setSelectedRows([]);
-    }
-  }, [selectAll, dictionaries]);
+  */
 
   const handleCheckboxChange = (event, id) => {
-    //console.log("handleCheckboxChange. id:", id);
-    //console.log("line: ", dictionaries[id]);
-    const isChecked = event.target.checked;
-    if (isChecked) {
-      setSelectedRows((prevSelectedRows) => [...prevSelectedRows, id]);
-    } else {
-      setSelectedRows((prevSelectedRows) =>
-        prevSelectedRows.filter((rowId) => rowId !== id)
-      );
-    }
+    console.log("handleCheckboxChange. id:", id);
+    onSelectionChange(event.target.checked, id);
   };
 
   const handleToggleSelectAll = () => {
-    setSelectAll((prevSelectAll) => !prevSelectAll);
+    onSelectAll();
   };
 
   if (dictionaries && dictionaries.length === 0) {
@@ -69,18 +45,28 @@ export function OrderedDictionaryArrayTable(props) {
   if (!dictionaries) {
     return <> Nothing to display</>;
   }
+
+  // Function to format the object as a nice string
+  const formatObject = (obj) => {
+    return JSON.stringify(obj, null, 2).replace(/"([^"]+)":/g, "$1:");
+  };
+
   const rows = dictionaries.map((dictionary, index) => {
     const cells = columnOrder.map((key) => {
-      return <td key={key}>{dictionary[key]}</td>;
+      let formattedValue =
+        typeof dictionary[key] === "object"
+          ? formatObject(dictionary[key])
+          : dictionary[key];
+      return <td key={key}>{formattedValue}</td>;
     });
 
     return (
-      <tr key={index} onClick={handleRowClick}>
+      <tr key={index}>
         {selectionEnabled && (
           <td>
             <input
               type="checkbox"
-              checked={selectedRows.includes(index)}
+              checked={isChecked(index)}
               onChange={(e) => handleCheckboxChange(e, index)}
             />
           </td>
@@ -103,7 +89,7 @@ export function OrderedDictionaryArrayTable(props) {
             <th>
               <input
                 type="checkbox"
-                checked={selectAll}
+                checked={isSelectAll()}
                 onChange={handleToggleSelectAll}
               />
             </th>

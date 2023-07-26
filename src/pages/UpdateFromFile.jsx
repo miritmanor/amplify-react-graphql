@@ -223,6 +223,8 @@ const UpdateFromFile = () => {
     }
   };
 
+  // apply the file contents to the selected stores - same updates for all the selected stores
+
   const applyValuesToStores = (values, stores) => {
     console.log("in applyValuesToStores");
 

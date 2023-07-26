@@ -7,7 +7,8 @@ import {
   fetchProduct,
   modifyProduct,
 } from "../utils/lambdaAccess.js";
-import { OrderedDictionaryArrayTable } from "../components/OrderedDictionaryArrayTable.jsx";
+//import { OrderedDictionaryArrayTable } from "../components/OrderedDictionaryArrayTable.jsx";
+import { ProductsTableWithSelection } from "../components/ProductsTableWithSelection.jsx";
 import FileUploader from "../components/upload";
 import { isInSearchTerm } from "../utils/search.js";
 
@@ -20,12 +21,11 @@ const Products = () => {
 
   const onSelectionChange = (selectedRows) => {
     //console.log("selectedRows:", selectedRows);
-    //setSelectedProducts(selectedRows);
     setSelectedProducts(
       products.filter((product, index) => selectedRows.includes(index))
     );
-    //console.log("selectedProducts:", selectedProducts);
   };
+
   const [searchTerm, setSearchTerm] = useState("");
   const [productSKU, setProductSKU] = useState("");
   const [inputs, setInputs] = useState({});
@@ -381,7 +381,7 @@ const Products = () => {
         Product list
       </Heading>
 
-      <OrderedDictionaryArrayTable
+      <ProductsTableWithSelection
         items={filteredProducts}
         columns={columns}
         onSelectionChange={onSelectionChange}

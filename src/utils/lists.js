@@ -10,7 +10,8 @@ export const MultipleLists = (list) => {
 // receive a list of dictionaries, each line representing a product, with a changes field that should be analyzed
 // the name of the field with the changes is a parameter
 // return a list with the changes analyzed
-export const changesList = (list,changesFieldName) => {
+/*
+export const changesListOfStrings = (list,changesFieldName) => {
   console.log("changesList: list:",list," changesFieldName:",changesFieldName )
   var newList=[];
   for (var i in list) {
@@ -46,7 +47,37 @@ export const changesList = (list,changesFieldName) => {
   return newList;
 
   }
+  */
 
+  export const changesList = (list,changesFieldName) => {
+    console.log("changesList: list:",list," changesFieldName:",changesFieldName )
+    var newList=[];
+    for (var i in list) {
+      const dict = list[i];
+      console.log("dict:",dict);
+      const changes = dict[changesFieldName];
+      console.log("changes:",changes )
+
+      try {
+        var newDict = dict;
+        if (typeof changes === 'string') {
+          continue;
+        }
+        for (var detail in changes) {
+          console.log("detail:",detail);
+          newDict={...newDict,'Field name': detail}; 
+          newDict={...newDict,'Value in main DB': changes[detail]['main DB']};
+          newDict={...newDict,'Value in store': changes[detail]['store']};
+          newList.push(newDict);
+          newDict['Details']='';
+        }
+      } catch (e) {
+        console.log("error in parsing:",e);
+      }
+    }
+    return newList;
+  
+    }
 
 
 //{'name': {'main DB': 'בזיליקום - 2 מארזים גדולים', 'store': 'בזיליקום – 2 מארזים'},
