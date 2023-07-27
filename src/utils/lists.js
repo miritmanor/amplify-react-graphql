@@ -61,6 +61,7 @@ export const changesListOfStrings = (list,changesFieldName) => {
       try {
         var newDict = dict;
         if (typeof changes === 'string') {
+          newList.push(newDict);
           continue;
         }
         for (var detail in changes) {

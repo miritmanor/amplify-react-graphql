@@ -10,7 +10,6 @@ export function OrderedDictionaryArrayTable(props) {
 
   var selectionEnabled = false;
   if (props.onSelectionChange) {
-    console.log("selection enabled");
     selectionEnabled = true;
   }
   //const [selectAll, setSelectAll] = useState(false);

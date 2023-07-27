@@ -9,7 +9,7 @@ import {
 } from "../utils/lambdaAccess.js";
 //import { OrderedDictionaryArrayTable } from "../components/OrderedDictionaryArrayTable.jsx";
 import { ProductsTableWithSelection } from "../components/ProductsTableWithSelection.jsx";
-import FileUploader from "../components/upload";
+import FileUploader from "../components/FileUploader";
 import { isInSearchTerm } from "../utils/search.js";
 
 import { Flex, Heading, View, Button, TextField } from "@aws-amplify/ui-react";
@@ -26,6 +26,11 @@ const Products = () => {
     );
   };
 
+  // todo add refresh button
+  // todo refresh products after every sync or update!
+  // todo check what to do with removed products. Maybe remove selected.
+  // maybe an option to display only products that are available in at least one store.
+  // how about CSV with a 'remove' column
   const [searchTerm, setSearchTerm] = useState("");
   const [productSKU, setProductSKU] = useState("");
   const [inputs, setInputs] = useState({});
@@ -289,6 +294,13 @@ const Products = () => {
           onClick={showImportButton}
         >
           {importButtonText}
+        </Button>
+        <Button
+          key="refreshProducts"
+          name="refresh_products"
+          onClick={refreshProducts}
+        >
+          Refresh list
         </Button>
       </Flex>
       {showUpdateForm && (
