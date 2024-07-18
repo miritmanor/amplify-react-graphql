@@ -50,10 +50,10 @@ const Products = () => {
 
   // when the user enters something in the search(filter) string - wait a bit then filter the products array and put the results in filteredProducts
   useEffect(() => {
-    //console.log("in useEffect - search");
+    console.log("in useEffect - search");
     const timeOutId = setTimeout(() => {
       const p = products.filter((item) => {
-        //console.log(item);
+        console.log(item);
         return isInSearchTerm(item, searchTerm);
       });
       setFilteredProducts(p);
